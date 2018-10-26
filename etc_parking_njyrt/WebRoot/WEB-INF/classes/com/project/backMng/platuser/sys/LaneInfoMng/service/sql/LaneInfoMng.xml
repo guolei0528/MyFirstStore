@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.sys.LaneInfoMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM lane_info t
+		  WHERE 
+			area_id=#{PARENT_ID}
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+    	SELECT 
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+			t.lane_flag,
+			t.lane_name,
+			t.spare1,
+			t.spare2,
+			t.spare3,
+			t.spare4,
+			a.area_name,	
+			t.s_comment
+		  FROM lane_info t,area_info a
+		 WHERE t.delete_flag=0
+		 <if test="park_id!=null and park_id!=''">
+		 and
+			t.park_id=#{park_id}
+		 </if>
+		 <if test="area_id!=null and area_id!=''">
+		 and
+			t.area_id=#{area_id}
+		 </if>
+		 <if test="QUERY_LANE_ID!=null and QUERY_LANE_ID!=''">
+		 	and t.lane_id like CONCAT('%',#{QUERY_LANE_ID},'%')
+		 </if>
+		 <if test="QUERY_LANE_FLAG!=null and QUERY_LANE_FLAG!=''">
+		 	and t.lane_flag=#{QUERY_LANE_FLAG}
+		 </if>
+			and t.area_id=a.area_id
+    </select>
+    
+    <insert id="insert" parameterType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+    	INSERT INTO lane_info(
+				lane_id,
+				park_id,
+				area_id,
+				lane_flag,
+			
+				lane_name,
+				spare1,
+				spare2,
+				spare3,
+				spare4,
+				s_comment,
+				delete_flag
+				)
+		VALUES(
+				#{lane_id},
+				#{park_id} ,
+				#{area_id} ,
+				#{lane_flag} ,
+				#{lane_name},
+				#{spare1} ,
+				#{spare2} ,
+				#{spare3} ,
+				#{spare4} ,
+				#{s_comment} ,
+				#{delete_flag}
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+        SELECT 
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+			t.lane_flag,
+			t.lane_name,
+			t.spare1,
+			t.spare2,
+			t.spare3,
+			t.spare4,
+				
+			t.s_comment
+		  FROM lane_info t
+        WHERE t.lane_id=#{VALUE}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+		UPDATE lane_info
+		SET 
+			park_id=#{park_id} ,
+			area_id=#{area_id} ,
+			lane_id=#{lane_id} ,
+			lane_flag=#{lane_flag} ,
+			lane_name=#{lane_name},
+<!-- 			spare1=#{spare1} , -->
+<!-- 			spare2=#{spare2} , -->
+<!-- 			spare3=#{spare3} , -->
+<!-- 			spare4=#{spare4} , -->
+			
+			s_comment=#{s_comment} 
+		WHERE lane_id=#{lane_id}
+    </update>
+	
+    <delete id="delete" parameterType="String">
+    	UPDATE lane_info
+    	SET delete_flag=1
+		 WHERE lane_id = #{value}
+		 and delete_flag=0
+    </delete>
+    
+    <select id="loadLaneTree" parameterType="String" resultType="treeModel">
+    	select t.lane_id id,t.lane_name name,area_id parentId,'false' isParent,'3'nodeType
+    	from lane_info t
+    	where area_id=#{PARENT_ID}
+    </select>
+    
+    <select id="findSameLane" parameterType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean" resultType="Integer">
+    	select count(1) from lane_info
+    	where lane_id=#{lane_id}
+    	and park_id=#{park_id}
+    	and area_id=#{area_id}
+    </select>
+</mapper>

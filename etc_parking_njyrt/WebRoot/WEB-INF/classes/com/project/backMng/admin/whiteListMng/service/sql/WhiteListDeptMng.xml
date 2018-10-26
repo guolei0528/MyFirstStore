@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.whiteList.WhiteDeptListMng">
+
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+		<if test="query_color!=null and query_color!=''">
+			AND t.color = #{query_color}
+		</if>
+		<if test="query_obu_id!=null and query_obu_id!=''">
+			AND t.obu_id = #{query_obu_id}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND t.vehicle_class = #{vehicle_class}
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.color,
+		t.obu_id,
+		t.vehicle_class,
+		t.status,
+		t.initiate_id,
+		t.valid_start_time,
+		t.valid_end_time,
+		t.last_modify_time,
+		(
+		select a.name from user a where a.user_id = t.initiate_id and a.delete_flag
+		= 0
+		) initiate_name,
+		(
+		select b.name from user b where b.user_id = t.comfirm_id and b.delete_flag =
+		0
+		) comfirm_name
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+		<if test="query_color!=null and query_color!=''">
+			AND t.color = #{query_color}
+		</if>
+		<if test="query_obu_id!=null and query_obu_id!=''">
+			AND t.obu_id = #{query_obu_id}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND t.vehicle_class = #{vehicle_class}
+		</if>
+		ORDER BY t.initiate_time desc
+	</select>
+
+	<!-- 查询总数量 -->
+	<select id="comfirmFindCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		AND t.status = 0
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+		<if test="query_color!=null and query_color!=''">
+			AND t.color = #{query_color}
+		</if>
+		<if test="query_obu_id!=null and query_obu_id!=''">
+			AND t.obu_id = #{query_obu_id}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND t.vehicle_class = #{vehicle_class}
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="comfirmFindList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.color,
+		t.obu_id,
+		t.vehicle_class,
+		t.status,
+		t.initiate_id,
+		t.valid_start_time,
+		t.valid_end_time,
+		t.last_modify_time,
+		(
+		select a.name from user a where a.user_id = t.initiate_id and a.delete_flag
+		= 0
+		) initiate_name,
+		(
+		select b.name from user b where b.user_id = t.comfirm_id and b.delete_flag =
+		0
+		) comfirm_name
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		AND t.status =0
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+		<if test="query_color!=null and query_color!=''">
+			AND t.color = #{query_color}
+		</if>
+		<if test="query_obu_id!=null and query_obu_id!=''">
+			AND t.obu_id = #{query_obu_id}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND t.vehicle_class = #{vehicle_class}
+		</if>
+		ORDER BY t.initiate_time desc
+	</select>
+
+
+
+	<!-- 查询数量 -->
+	<select id="countWhiteList" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		<if test="mv_license!=null and mv_license!=''">
+			AND t.mv_license = #{mv_license}
+		</if>
+		<if test="color!=null and color!=''">
+			AND t.color = #{color}
+		</if>
+		<if test="obu_id!=null and obu_id!=''">
+			AND t.obu_id = #{obu_id}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND t.vehicle_class = #{vehicle_class}
+		</if>
+		<if test="last_modify_time!=null and last_modify_time!=''">
+			AND t.last_modify_time = #{last_modify_time}
+		</if>
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="updateWhiteListByLicense" parameterType="com.project.backMng.admin.sys.model.UserBean">
+		UPDATE
+		white_list
+		SET
+		last_modify_time=now() ,
+		initiate_id=#{initiate_id} ,
+		initiate_time=now(),
+		status=#{status}
+		WHERE last_modify_time=#{last_modify_time}
+		AND mv_license=#{mv_license} AND delete_flag = 0
+	</update>
+
+
+	<!-- 增加白名单 -->
+	<insert id="insertWhiteList" parameterType="objectMap">
+		INSERT INTO
+		white_list(mv_license, color, obu_id,
+		vehicle_class,initiate_id,initiate_time,
+		<if test="comfirm_id!=null and comfirm_id!=''">
+			comfirm_id,
+		</if>
+		<if test="comfirm_time!=null">
+			comfirm_time,
+		</if>
+		delete_flag,
+		last_modify_time,status,valid_start_time,valid_end_time
+		)
+		VALUES
+		(#{mv_license}, #{color},
+		#{obu_id},#{vehicle_class},
+		#{initiate_id},#{initiate_time},
+		<if test="comfirm_id!=null and comfirm_id!=''">
+			#{comfirm_id},
+		</if>
+		<if test="comfirm_time!=null">
+			#{comfirm_time},
+		</if>
+		0,
+		#{last_modify_time},#{status},#{valid_start_time},#{valid_end_time})
+	</insert>
+	
+	
+	<!-- 增加白名单 -->
+	<update id="updateWhiteListStatus" parameterType="objectMap">
+		UPDATE
+		white_list SET 
+		status=#{status},
+		<if test="initiate_id!=null and initiate_id!=''">
+			initiate_id = #{initiate_id},
+		</if>
+		<if test="initiate_time!=null">
+			initiate_time = #{initiate_time},
+		</if>
+		<if test="comfirm_id!=null and comfirm_id!=''">
+			comfirm_id = #{comfirm_id},
+		</if>
+		<if test="comfirm_time!=null">
+			comfirm_time = #{comfirm_time},
+		</if>
+		last_modify_time=#{last_modify_time_now}
+		WHERE delete_flag = 0 AND
+		last_modify_time = #{last_modify_time}
+		<if test="mv_license!=null and mv_license!=''">
+			AND mv_license = #{mv_license}
+		</if>
+		<if test="color!=null and color!=''">
+			AND color = #{color}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND vehicle_class = #{vehicle_class}
+		</if>
+		<if test="obu_id!=null and obu_id!=''">
+			AND obu_id = #{obu_id}
+		</if>
+	</update>
+
+
+	<!-- 删除白名单车辆信息 -->
+	<delete id="deleteWhiteList" parameterType="objectMap">
+		delete from
+		white_list where mv_license = #{mv_license} AND color = #{color} AND delete_flag = 0
+	</delete>
+	
+	<update id="deleteStatusWhiteList" parameterType="objectMap">
+		UPDATE
+		white_list SET 
+		delete_flag=#{delete_flag},
+		last_modify_time=#{last_modify_time_now}
+		WHERE delete_flag = 0 AND
+		last_modify_time = #{last_modify_time}
+		<if test="mv_license!=null and mv_license!=''">
+			AND mv_license = #{mv_license}
+		</if>
+		<if test="color!=null and color!=''">
+			AND color = #{color}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND vehicle_class = #{vehicle_class}
+		</if>
+		<if test="obu_id!=null and obu_id!=''">
+			AND obu_id = #{obu_id}
+		</if>
+	</update>
+	
+	
+</mapper>

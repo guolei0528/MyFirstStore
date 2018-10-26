@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.pub.RoleMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM role t
+		 WHERE t.delete_flag=0
+		 <if test="QUERY_NAME!=null and QUERY_NAME!=''">
+				AND t.role_name like CONCAT('%', #{QUERY_NAME}, '%')
+	     </if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="objectMap">
+    	SELECT t.role_id,t.role_name,t.s_comment,t.create_time,t.last_modify_time,t.delete_flag
+		  FROM role t
+		 WHERE t.delete_flag=0
+		 <if test="QUERY_NAME!=null and QUERY_NAME!=''">
+				AND t.role_name like CONCAT('%', #{QUERY_NAME}, '%')
+			</if>
+			
+		ORDER BY t.create_time asc
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findAllList" parameterType="objectMap" resultType="objectMap">
+    	SELECT t.role_id,t.role_name,t.create_time,t.last_modify_time,t.delete_flag
+		  FROM role t
+		 WHERE t.delete_flag=0
+		ORDER BY t.create_time desc
+    </select>
+	
+    <insert id="insert" parameterType="objectMap">
+    	INSERT INTO role(role_id, role_name, s_comment, create_time, last_modify_time, delete_flag)
+		VALUES(#{role_id},#{role_name},#{s_comment},current_timestamp,current_timestamp,#{delete_flag})
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="objectMap">
+        SELECT role_id,role_name,s_comment,create_time,last_modify_time,delete_flag
+		  FROM role
+        WHERE role_id=#{VALUE}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="objectMap">
+		UPDATE role
+		SET role_name=#{role_name},s_comment=#{s_comment},last_modify_time=current_timestamp
+		WHERE role_id=#{role_id}
+    </update>
+	
+    <update id="delete" parameterType="String">
+    	UPDATE role
+		   SET delete_flag = 1
+		 WHERE role_id = #{value}
+    </update>
+    
+    <select id="selectAddTreeMap" parameterType="objectMap" resultType="treeModel">
+    	SELECT id, name, (case when t.parent_id is NULL then 'true' else 'false' end) isParent, parent_id parentId ,'false' checked
+        FROM sys_menu T 
+	   where 1=1
+	   <choose>
+	   	<when test="PARENT_ID!=null and PARENT_ID!=''">
+	   		and parent_id=#{PARENT_ID}
+	   	</when>
+	   	<otherwise>
+	   		and parent_id IS NULL 
+	   	</otherwise>
+	   </choose>
+	   order by show_order asc 
+    </select>
+    
+    
+    <select id="selectEditTreeMap" parameterType="objectMap" resultType="treeModel">
+    	SELECT t.id, t.name, (case when t.parent_id is NULL then 'true' else 'false' end) isParent, t.parent_id parentId ,
+    	(case when m.ID is not NULL then 'true' else 'false' end) checked
+        FROM sys_menu t left join role_menu m on t.id=m.menu_id AND m.role_id=#{ROLE_ID}
+	   where 1=1
+	   <choose>
+	   	<when test="PARENT_ID!=null and PARENT_ID!=''">
+	   		and t.parent_id=#{PARENT_ID}
+	   	</when>
+	   	<otherwise>
+	   		and t.parent_id IS NULL 
+	   	</otherwise>
+	   </choose>
+	   order by t.show_order asc 
+    </select>
+    
+    
+    <select id="selectViewTreeMap" parameterType="objectMap" resultType="treeModel">
+    	SELECT t.id, t.name, (case when t.parent_id is NULL then 'true' else 'false' end) isParent, t.parent_id parentId 
+        FROM sys_menu t inner join role_menu m on t.id=M.menu_id AND M.role_id=#{ROLE_ID}
+	   where 1=1
+	   <choose>
+	   	<when test="PARENT_ID!=null and PARENT_ID!=''">
+	   		and t.parent_id=#{PARENT_ID}
+	   	</when>
+	   	<otherwise>
+	   		and t.parent_id IS NULL 
+	   	</otherwise>
+	   </choose>
+	   order by t.show_order asc 
+    </select>
+    
+    <insert id="insertRoleMenu" parameterType="objectMap">
+    	INSERT INTO role_menu (role_id, menu_id)
+		VALUES (#{role_id}, #{menu_id})
+    </insert>
+    
+    <delete id="deleteRoleMenu" parameterType="String">
+    	DELETE FROM role_menu WHERE ROLE_ID=#{value}
+    </delete>
+    
+    <select id="selectAllUsableRoleByOwnerID" parameterType="map" resultType="objectMap">
+    	SELECT ID, NAME, REMARK, USER_TYPE, CREATE_TIME, LAST_MODIFY_TIME, DELETE_FLAG
+		FROM t_role
+		WHERE DELETE_FLAG=0 AND USER_TYPE=#{USER_TYPE}
+		and OWNER_ID =#{OWNER_ID}
+		ORDER BY name asc
+    </select>
+    <select id="selectAllUsableRole" parameterType="Integer" resultType="objectMap">
+    	SELECT ID, NAME, REMARK, USER_TYPE, CREATE_TIME, LAST_MODIFY_TIME, DELETE_FLAG
+		FROM t_role
+		WHERE DELETE_FLAG=0 AND USER_TYPE=#{USER_TYPE}
+		ORDER BY name asc
+    </select>
+    <insert id="saveRoleUser" parameterType="objectMap">
+   		insert into t_role_user
+    		(ROLE_ID,USER_ID,RELATED_TIME)
+    	values(
+    	#{ROLE_ID},#{USER_ID},now()
+    	)
+    
+    </insert>
+    <update id="updateRoleUser" parameterType="objectMap">
+    
+    	update t_role_user set
+    		ROLE_ID=#{ROLE_ID}
+<!--     		USER_ID=#{USER_ID} -->
+    	where 
+    		USER_ID=#{USER_ID}
+    </update>
+    
+    <select id="findByUserId" parameterType="map" resultType="objectMap">
+    	select t.ID,t.USER_ID,t.ROLE_ID ,r.NAME ROLE_NAME FROM t_role_user t
+    	
+    	left join t_role r on r.ID=t.ROLE_ID
+    	
+    	 WHERE USER_ID=#{USER_ID}
+    
+    </select>
+</mapper>

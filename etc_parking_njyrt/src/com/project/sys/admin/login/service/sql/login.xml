@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sys.login.admin">
+	<resultMap id="loginUserResultMap" type="loginUserBean">
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="login_name" jdbcType="VARCHAR" property="loginName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="user_operator" jdbcType="VARCHAR" property="userOperator" />
+    <result column="user_shift" jdbcType="INTEGER" property="userShift" />
+    <result column="operator_shift" jdbcType="INTEGER" property="operatorShift" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="in_use_flag" jdbcType="INTEGER" property="inUseFlag" />
+    <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+	</resultMap>
+
+
+	<!-- ****************************查询起始的id****************************** <select 
+		id="findUser" parameterType="objectMap" resultType="userBean"> SELECT s.id,s.login_name 
+		name,s.user_type FROM sys_user s WHERE s.login_name=#{login_name} AND s.password=#{password} 
+		UNION ALL select lu.login_name id, lu.user_name name,lu.user_type from login_user 
+		lu where lu.login_name=#{login_name} and lu.password=#{password} AND lu.delete_flag=0 
+		AND lu.in_use_flag = 1 </select>** -->
+
+	<!-- ***********************登录查询用户****************************** -->
+	<select id="findLoginUser" parameterType="objectMap" resultMap="loginUserResultMap">
+		select user_id userid,login_name,name,role_id,in_use_flag,user_operator,area_id 
+		from user
+		where
+		login_name=#{login_name} and password=#{password}
+		AND delete_flag=0
+	</select>
+
+	<select id="findUserInUserFlag" parameterType="String"
+		resultType="String">
+		SELECT in_use_flag FROM login_user WHERE login_name =
+		#{value}
+	</select>
+
+
+	<select id="findAdminTreeList" parameterType="objectMap"
+		resultType="treeModel">
+		SELECT T.ID, NAME, (case when T.PARENT_ID is NULL then 'true' else
+		'false' end) isParent, T.PARENT_ID parentId, T.URL urlAction
+		FROM t_sys_menu T
+		where T.USER_TYPE=#{USER_TYPE}
+		<if test="PARENT_ID==null">
+			and T.PARENT_ID IS NULL
+		</if>
+		<if test="PARENT_ID!=null">
+			and T.PARENT_ID=#{PARENT_ID}
+		</if>
+		<if test="USER_TYPE==2">
+			and T.ID IN (
+			SELECT rm.MENU_ID
+			FROM t_role_user ru ,t_role_menu rm
+			WHERE ru.USER_ID=#{USER_ID} AND ru.ROLE_ID=rm.ROLE_ID
+			)
+		</if>
+
+
+		order by T.SHOW_ORDER asc
+	</select>
+
+	<select id="selectProvinceList" resultType="String">
+		SELECT DISTINCT
+		PROVINCE
+		FROM t_map_point
+		ORDER BY PROVINCE ASC
+	</select>
+
+	<select id="loadCityList" parameterType="String" resultType="String">
+		SELECT DISTINCT CITY
+		FROM t_map_point
+		WHERE PROVINCE=#{value}
+		ORDER BY
+		PROVINCE ASC
+	</select>
+
+	<select id="loadCityInfo" parameterType="String" resultType="objectMap">
+		SELECT ID, PROVINCE, CITY, LONGITUDE, LATITUDE, IS_OPEN_BUS
+		FROM
+		t_map_point
+		WHERE CITY=#{value}
+	</select>
+
+	<select id="findAllTreeListByUserType" parameterType="objectMap"
+		resultType="treeModel">
+		SELECT T.ID, T.NAME, (case when T.PARENT_ID is NULL then 'true' else
+		'false' end) isParent, T.PARENT_ID parentId, T.URL urlAction
+		FROM t_sys_menu T
+		where T.USER_TYPE=#{USER_TYPE}
+		<if test="USER_TYPE==2">
+			and T.ID IN (
+			SELECT rm.MENU_ID
+			FROM t_role_user ru ,t_role_menu rm
+			WHERE ru.USER_ID=#{USER_ID} AND ru.ROLE_ID=rm.ROLE_ID
+			)
+		</if>
+		order by T.SHOW_ORDER asc
+	</select>
+
+	<select id="findAllTreeMenuListByRoleId" parameterType="objectMap"
+		resultType="treeModel">
+		SELECT T.ID, T.NAME, (case when T.PARENT_ID is NULL then 'true' else
+		'false' end) isParent, T.PARENT_ID parentId, T.URL urlAction
+		FROM sys_menu T
+		where EXISTS (
+		SELECT rm.MENU_ID
+		FROM role_menu rm
+		WHERE rm.role_id = #{role_id}
+		and rm.menu_id = t.id
+		)
+		order by T.SHOW_ORDER asc
+	</select>
+
+</mapper>
+
+
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.transitRecord.CompreSearch">
+	<!-- 模糊查询车牌 -->
+	<select id="queryPlates" parameterType="String" resultType="String">
+		select distinct mvlicense from (
+		select left(mvlicense,char_length(mvlicense)-1) mvlicense from cur_entry
+		where left(mvlicense,char_length(mvlicense)-1) like concat('%',#{plate},'%')
+		union all
+		select left(mvlicense,char_length(mvlicense)-1) from cur_exit
+		where left(mvlicense,char_length(mvlicense)-1) like concat('%',#{plate},'%')
+		union all
+		select mvlicense from cur_centerpay
+		where mvlicense like concat('%',#{plate},'%')
+		union all
+		select mv_license from order_car
+		where mv_license like concat('%',#{plate},'%')) t
+	</select>
+
+	<select id="queryCompreRecords" parameterType="objectMap" statementType="CALLABLE" 
+		resultType="com.project.backMng.admin.transitRecord.CompreSearch.model.CompreRecordBean">
+		CALL proc_record_search(#{username},#{orderid},#{plate},#{begindate},#{enddate})
+	</select>
+	
+	<select id="queryRecordDetail" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.CompreSearch.model.RecordDetailBean">
+		<if test="type != null and type==1">
+			SELECT t1.mvlicense mv_license,IFNULL(t2.lane_name,t1.entrylane) entry_lane,DATE_FORMAT(t1.entrytime,"%Y-%m-%d %H:%i:%s") entry_time,IFNULL(t4.`name`,t1.entryoperator) entry_operator,IFNULL(t3.lane_name,t1.exitlane) exit_lane,DATE_FORMAT(t1.exittime,"%Y-%m-%d %H:%i:%s") exit_time,IFNULL(t5.`name`,t1.exitoperator) exit_operator,CASE t1.paymethod WHEN 0 THEN '现金' WHEN 2 THEN 'ETC' WHEN 3 THEN '微信' WHEN 4 THEN '支付宝' WHEN 9 THEN '放行' WHEN 10 THEN '免费模式' WHEN 11 THEN '预支付' ELSE '其他' END pay_method,t1.totaltoll*0.01 totaltoll,t1.imagepath
+			FROM cur_exit t1 LEFT OUTER JOIN lane_info t2 ON t1.entrylane=t2.lane_id LEFT OUTER JOIN lane_info t3 ON t1.exitlane=t3.lane_id LEFT OUTER JOIN `user` t4 ON t1.entryoperator=t4.login_name LEFT OUTER JOIN `user` t5 ON t1.exitoperator=t5.login_name
+			WHERE LEFT(mvlicense,CHAR_LENGTH(mvlicense)-1)=#{license} AND DATE_FORMAT(exittime,"%Y-%m-%d %H:%i:%s")=#{time}
+		</if>
+		<if test="type != null and type==2">
+			SELECT mvlicense mv_license,IFNULL(lane_name,entrylane) entry_lane,DATE_FORMAT(entrytime,"%Y-%m-%d %H:%i:%s") entry_time,IFNULL(t2.`name`,entryoperator) entry_operator,imagepath
+			FROM cur_entry t1 LEFT OUTER JOIN `user` t2 ON t1.entryoperator=t2.login_name LEFT OUTER JOIN lane_info t3 ON t1.entrylane=t3.lane_id
+			WHERE LEFT(mvlicense,CHAR_LENGTH(mvlicense)-1)=#{license} AND DATE_FORMAT(entrytime,"%Y-%m-%d %H:%i:%s")=#{time}
+		</if>
+		<if test="type != null and type==3">
+			SELECT t1.mvlicense mv_license,IFNULL(t2.lane_name,t1.entrylane) entry_lane,DATE_FORMAT(t1.entrytime,"%Y-%m-%d %H:%i:%s") entry_time,IFNULL(t3.`name`,t1.entryoperator) entry_operator,DATE_FORMAT(t1.terminaltime,"%Y-%m-%d %H:%i:%s") terminal_time,IFNULL(t4.`name`,t1.terminaloperator) terminal_operator,CASE t1.paymethod WHEN 0 THEN '现金' WHEN 2 THEN 'ETC' WHEN 3 THEN '微信' WHEN 4 THEN '支付宝' WHEN 9 THEN '放行' WHEN 10 THEN '免费模式' WHEN 11 THEN '预支付' ELSE '其他' END pay_method,t1.totaltoll*0.01 totaltoll,t1.imagepath
+			FROM cur_centerpay t1 LEFT OUTER JOIN lane_info t2 ON t1.entrylane=t2.lane_id LEFT OUTER JOIN `user` t3 ON t1.entryoperator=t3.login_name LEFT OUTER JOIN `user` t4 ON t1.terminaloperator=t4.login_name
+			WHERE mvlicense=#{license} AND DATE_FORMAT(terminaltime,"%Y-%m-%d %H:%i:%s")=#{time}
+		</if>
+		<if test="type != null and type==4">
+			SELECT mv_license,order_id,lane_name entry_lane,DATE_FORMAT(entry_time,"%Y-%m-%d %H:%i:%s") entry_time,pay_bill*0.01 pay_bill,DATE_FORMAT(pay_time,"%Y-%m-%d %H:%i:%s") pay_time,CASE pay_method WHEN 0 THEN '现金' WHEN 2 THEN 'ETC' WHEN 3 THEN '微信' WHEN 4 THEN '支付宝' WHEN 9 THEN '放行' WHEN 10 THEN '免费模式' WHEN 11 THEN '预支付' ELSE '其他' END pay_method
+			FROM order_car t1 LEFT OUTER JOIN lane_info t2 ON t1.entry_lane=t2.lane_id
+			WHERE mv_license=#{license} AND DATE_FORMAT(pay_time,"%Y-%m-%d %H:%i:%s")=#{time}
+		</if>
+	</select>
+</mapper>

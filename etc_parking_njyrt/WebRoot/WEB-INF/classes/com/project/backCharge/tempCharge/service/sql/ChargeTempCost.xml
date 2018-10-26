@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backCharge.tempCharge.tempCost">
+	<resultMap id="chargeTempCostResultMap" type="tempCostBean">
+		<id column="mv_license" jdbcType="VARCHAR" property="mvLicense" />
+		<result column="car_color" jdbcType="INTEGER" property="carColor" />
+		<result column="park_id" jdbcType="VARCHAR" property="parkId" />
+		<result column="area_id" jdbcType="VARCHAR" property="areaId" />
+		<result column="entry_lane" jdbcType="SMALLINT" property="entryLane" />
+		<result column="entry_time" jdbcType="TIMESTAMP" property="entryTime" />
+		<result column="entry_date" jdbcType="INTEGER" property="entryDate" />
+		<result column="vehicle_class" jdbcType="INTEGER" property="vehicleClass" />
+		<result column="income_bill" jdbcType="INTEGER" property="incomeBill" />
+		<result column="real_bill" jdbcType="INTEGER" property="realBill" />
+		<result column="is_rebate" jdbcType="INTEGER" property="isRebate" />
+		<result column="is_model" jdbcType="INTEGER" property="isModel" />
+		<result column="begin_time" jdbcType="TIMESTAMP" property="beginTime" />
+		<result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+		<result column="lane_id" jdbcType="VARCHAR" property="laneId" />
+		<result column="date_time" jdbcType="TIMESTAMP" property="dateTime" />
+		<result column="spare1" jdbcType="INTEGER" property="spare1" />
+		<result column="spare2" jdbcType="INTEGER" property="spare2" />
+		<result column="spare3" jdbcType="VARCHAR" property="spare3" />
+		<result column="spare4" jdbcType="VARCHAR" property="spare4" />
+		<result column="s_comment" jdbcType="VARCHAR" property="sComment" />
+		<result column="pay_method" jdbcType="INTEGER" property="payMethod" />
+		<result column="prepay_bill" jdbcType="INTEGER" property="prepayBill" />
+		<result column="trad_no" jdbcType="VARCHAR" property="tradNo" />
+		<result column="obu_id" jdbcType="VARCHAR" property="obuId" />
+		<result column="card_network" jdbcType="INTEGER" property="cardNetwork" />
+		<result column="card_id" jdbcType="VARCHAR" property="cardId" />
+		<result column="card_type" jdbcType="BIT" property="cardType" />
+		<result column="pay_status" jdbcType="INTEGER" property="payStatus" />
+		<result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+		<result column="entry_image" jdbcType="VARCHAR" property="entryImage" />
+	</resultMap>
+	
+	
+	
+	<!-- 查询数据列表 -->
+	<select id="findTempCostListByBeforeTime" parameterType="objectMap"
+		resultMap="chargeTempCostResultMap">
+		SELECT
+		t.park_id,
+		t.area_id,
+		t.entry_lane,
+		t.entry_time,
+		t.vehicle_class,
+		t.mv_license,
+		t.car_color,
+		t.is_rebate,
+		t.pay_status,
+		t.pay_time
+		FROM temp_cost t
+		where t.entry_time>=DATE_SUB(now(),INTERVAL 5 MINUTE) and (t.entry_image is null or t.entry_image = '')
+		ORDER BY t.entry_time asc
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findTempCostList" parameterType="objectMap"
+		resultMap="chargeTempCostResultMap">
+		SELECT
+		t.park_id,
+		t.area_id,
+		t.entry_lane,
+		t.entry_time,
+		t.vehicle_class,
+		t.mv_license,
+		t.car_color,
+		t.is_rebate,
+		t.pay_status,
+		t.pay_time
+		FROM temp_cost t
+		ORDER BY t.entry_time asc
+	</select>
+
+
+	<!-- 查询临时计费 -->
+	<select id="findTempCost" parameterType="objectMap"
+		resultMap="chargeTempCostResultMap">
+		SELECT
+		t.prepay_bill,
+		t.income_bill,
+		t.real_bill,
+		t.entry_lane,
+		t.entry_time,
+		t.vehicle_class,
+		t.mv_license,
+		t.car_color,
+		t.is_rebate,
+		t.pay_time,
+		t.pay_status,
+		t.entry_image,
+		t.pay_method,
+		t.card_network,
+		t.card_id,
+		t.obu_id,
+		t.is_model,
+		t.area_id
+		FROM temp_cost t
+		where
+		t.mv_license = #{mv_license}
+		<if test="car_color!=null and car_color!=''">
+			and t.color=#{car_color}
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and t.area_id=#{area_id}
+		</if>
+		<if test="entry_lane!=null and entry_lane!=0">
+			and t.entry_lane=#{entry_lane}
+		</if>
+		<if test="entry_time!=null">
+			and DATE_FORMAT(t.entry_time,'%Y-%m-%d %H:%i:%s') = DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+	</select>
+
+	<select id="countTempCostByPrimary" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		FROM temp_cost t
+		where t.mv_license =
+		#{mv_license}
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and t.area_id=#{area_id}
+		</if>
+		and t.mv_license not like
+		'%无牌车%'
+	</select>
+
+
+	<insert id="insertTempCost"
+		parameterType="com.project.backCharge.tempCharge.model.TempCostBean">
+		INSERT INTO temp_cost(
+		park_id,
+		area_id,
+		entry_lane,
+		entry_time,
+		entry_date,
+		vehicle_class,
+		mv_license,
+		car_color,
+		<if test="obuId!=null and obuId!=''">
+		obu_id,
+		</if>
+		<if test="cardNetwork!=null">
+		card_network,
+		</if>
+		<if test="cardId!=null and cardId!=''">
+		card_id,
+		</if>
+		income_bill,
+		real_bill,
+		is_rebate,
+		<if test="spare1!=null">
+		spare1,
+		</if>
+		<if test="spare4!=null and spare4!=''">
+		spare4,
+		</if>
+		is_model
+		)
+		VALUES(
+		#{parkId} ,
+		#{areaId} ,
+		#{entryLane} ,
+		#{entryTime} ,
+		#{entryDate} ,
+		#{vehicleClass} ,
+		#{mvLicense} ,
+		#{carColor} ,
+		<if test="obuId!=null and obuId!=''">
+		#{obuId},
+		</if>
+		<if test="cardNetwork!=null">
+		#{cardNetwork},
+		</if>
+		<if test="cardId!=null and cardId!=''">
+		#{cardId},
+		</if>
+		#{incomeBill} ,
+		#{realBill},
+		#{isRebate},
+		<if test="spare1!=null">
+		#{spare1},
+		</if>
+		<if test="spare4!=null and spare4!=''">
+		#{spare4},
+		</if>
+		#{isModel}
+		)
+	</insert>
+
+	<select id="findInfo" parameterType="String" resultMap="chargeTempCostResultMap">
+		SELECT
+		t.member_id,
+		t.name,
+		t.sex,
+		DATE_FORMAT(t.birthday,'%Y-%m-%d') birthday,
+		t.phone,
+		t.location,
+		DATE_FORMAT(t.last_modify_time,'%Y-%m-%d %H:%i:%s')
+		last_modify_time
+		FROM member t
+		WHERE t.member_id=#{member_id} and
+		t.delete_flag=0
+	</select>
+
+<!-- 新增临时计费未记录表 -->
+	<insert id="insertTempCostUncertain" parameterType="com.project.backCharge.tempCharge.model.TempCostBean">
+		INSERT INTO
+		temp_cost_uncertain(
+		park_id,
+		area_id,
+		entry_lane,
+		entry_time,
+		entry_date,
+		vehicle_class,
+		mv_license,
+		car_color,
+		obu_id,
+		card_network,
+		card_id,
+		income_bill,
+		real_bill,
+		is_rebate,
+		is_model,
+		is_vaild,
+		pay_method,
+		pay_status,
+		pay_time,
+		prepay_bill,
+		entry_image,
+		trml_park_id,
+		trml_area_id,
+		terminal_id,
+		trad_no,
+		spare1,
+		spare2,
+		spare3,
+		spare4,
+		s_comment
+		) SELECT 
+		park_id,
+		area_id,
+		entry_lane,
+		entry_time,
+		entry_date,
+		vehicle_class,
+		mv_license,
+		car_color,
+		obu_id,
+		card_network,
+		card_id,
+		income_bill,
+		real_bill,
+		is_rebate,
+		is_vaild,
+		is_model,
+		pay_method,
+		pay_status,
+		pay_time,
+		prepay_bill,
+		entry_image,
+		trml_park_id,
+		trml_area_id,
+		terminal_id,
+		trad_no,
+		spare1,
+		spare2,
+		spare3,
+		spare4,
+		s_comment
+		from temp_cost
+		WHERE mv_license=#{mvLicense}
+		<if test="parkId!=null and parkId!=''">
+			and park_id = #{parkId}
+		</if>
+	</insert>
+
+
+	<!-- 更新项目的信息 -->
+	<update id="updateTempCostEntryTime"
+		parameterType="com.project.backCharge.tempCharge.model.TempCostBean">
+		UPDATE temp_cost
+		SET
+		park_id=#{parkId},
+		area_id=#{areaId},
+		entry_lane=#{entryLane},
+		entry_time=#{entryTime},
+		entry_date=#{entryDate},
+		<if test="obuId!=null and obuId!=''">
+		obu_id=#{obuId},
+		</if>
+		<if test="cardNetwork!=null">
+		card_network=#{cardNetwork},
+		</if>
+		<if test="cardId!=null and cardId!=''">
+		card_id=#{cardId},
+		</if>
+		vehicle_class=#{vehicleClass},
+		income_bill=#{incomeBill},
+		real_bill=#{realBill},
+		is_rebate=#{isRebate},
+		is_model=#{isModel},
+		is_vaild=1,
+		pay_method=null,
+		trad_no=null,
+		pay_status=0,
+		prepay_bill=0,
+		pay_time=null,
+		entry_image='',
+		trml_park_id='',
+		trml_area_id='',
+		terminal_id=null,
+		date_time = now()
+		WHERE mv_license=#{mvLicense}
+		<if test="parkId!=null and parkId!=''">
+			and park_id = #{parkId}
+		</if>
+	</update>
+
+
+	<!-- 更新项目的信息 -->
+	<update id="updateTempCostBill"
+		parameterType="com.project.backCharge.tempCharge.model.TempCostBean">
+		UPDATE temp_cost
+		SET
+		income_bill=#{incomeBill} ,
+		real_bill=#{realBill} ,
+		date_time = now()
+		WHERE mv_license=#{mvLicense}
+		<if test="carColor!=null">
+		and car_color=#{carColor}
+		</if>
+	</update>
+
+	<!-- 更新入口图片信息 -->
+	<update id="updateEntryImage"
+		parameterType="com.project.backCharge.tempCharge.model.TempCostBean">
+		UPDATE temp_cost
+		SET
+		entry_image=#{entryImage}
+		WHERE
+		mv_license=#{mvLicense}
+		AND entry_time = #{entryTime}
+		AND entry_lane = #{entryLane}
+		<if test="carColor!=null">
+		and car_color=#{carColor}
+		</if>
+	</update>
+
+	<!-- 删除会员信息 -->
+	<update id="deleteMember" parameterType="String">
+		UPDATE member
+		SET
+		DELETE_FLAG = 1
+		WHERE member_id = #{member_id}
+	</update>
+
+	<insert id="insertMember" parameterType="objectMap">
+		INSERT INTO
+		member(member_id, name, sex, birthday, phone,
+		location,delete_flag,last_modify_time)
+		VALUES (#{member_id}, #{name},
+		#{sex}, #{birthday}, #{phone},
+		#{location},#{delete_flag},#{last_modify_time})
+	</insert>
+
+	<update id="updateLoginUser" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+		UPDATE t_login_user
+		SET
+		LOGIN_NAME=#{MOBILE},
+		IN_USE_FLAG=#{IN_USE_FLAG}
+		WHERE USER_ID=#{ID}
+	</update>
+
+	<update id="deleteLoginUser" parameterType="String">
+		UPDATE t_login_user
+		SET DELETE_FLAG=1
+		WHERE USER_ID=#{value}
+	</update>
+
+	<update id="deleteTempCostBymvlicense" parameterType="objectMap">
+		delete from
+		temp_cost where mv_license=#{mv_license}
+		<if test="car_color!=null">
+			and car_color=#{car_color}
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		<if test="entry_lane!=null and entry_lane!=0">
+			and entry_lane=#{entry_lane}
+		</if>
+		and DATE_FORMAT(entry_time,'%Y-%m-%d %H:%i:%s') = DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+	</update>
+	
+	<update id="updateVaildBymvlicense" parameterType="objectMap">
+		update  temp_cost set is_vaild = #{is_vaild} , end_time= now()
+        <if test="car_color!=null">
+			and car_color=#{car_color}
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		<if test="entry_lane!=null and entry_lane!=0">
+			and entry_lane=#{entry_lane}
+		</if>
+		and DATE_FORMAT(entry_time,'%Y-%m-%d %H:%i:%s') = DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s');
+	</update>
+	
+	
+	
+	<update id="deleteTempCostBylicense" parameterType="objectMap">
+		delete from
+		temp_cost where mv_license=#{mv_license}
+		<if test="car_color!=null">
+			and car_color=#{car_color}
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		<if test="entry_lane!=null and entry_lane!=0">
+			and entry_lane=#{entry_lane}
+		</if>
+	</update>
+
+	<insert id="saveUserRoleByUserId" parameterType="objectMap">
+		INSERT INTO
+		t_role_user(ROLE_ID, USER_ID, RELATED_TIME)
+		VALUES (#{ROLE_ID},
+		#{USER_ID}, NOW())
+	</insert>
+
+	<!-- 更改为已支付状态，赋值金额 -->
+	<update id="updateStatus" parameterType="objectMap">
+		update temp_cost
+		set
+		pay_method='4',pay_status=1,pay_time=#{pay_time},prepay_bill=#{prepay_bill}
+		where mv_license = #{mv_license,jdbcType=VARCHAR} 
+		and car_color = #{car_color,jdbcType=INTEGER}
+	</update>
+	
+	
+
+	<!-- 查询临时计费 -->
+	<select id="findParkInfo" parameterType="objectMap"
+		resultMap="chargeTempCostResultMap">
+		SELECT
+		t.park_id,
+		t.area_id,
+		t.entry_lane,
+		t.entry_time
+		FROM
+		temp_cost t
+		where t.mv_license = #{mvLicense}
+		and
+		t.car_color=#{carColor}
+	</select>
+
+
+
+
+	<!-- 根据车牌查询数据列表 -->
+	<select id="findExistsWhiteByLicense" parameterType="objectMap"
+		resultType="Integer">
+		SELECT
+		count(1)
+		FROM white_list t
+		where delete_flag = 0
+		and t.mv_license =
+		#{mvLicense}
+		<if test="carColor!=null and carColor!=''">
+			and t.color=#{carColor}
+		</if>
+		<if test="vehicleClass!=null and vehicleClass!=''">
+			and t.vehicle_class=#{vehicleClass}
+		</if>
+	</select>
+
+
+	<!-- 根据obu编号查询数据列表 -->
+	<select id="findExistsWhiteByOBUId" parameterType="objectMap"
+		resultType="Integer">
+		SELECT
+		count(1)
+		FROM white_list t
+		where delete_flag = 0
+		and
+		t.obu_id = #{obuId}
+	</select>
+
+
+	<!-- 查询数据列表 -->
+	<select id="findExistsWhitefindExistsWhite" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		FROM member_sale_info t,car_info c
+		where
+		t.member_id = c.member_id
+		and t.begin_time &lt; now()
+		and t.end_time
+		&gt; now()
+		and valid = 0
+		and delete_flag = 0
+		and c.mv_license =
+		#{mvLicense}
+		and c.car_color=#{carColor}
+		and t.member_type!='00'
+	</select>
+	
+	<!-- 查询临时计费 -->
+	<select id="findTempCostByLaneTime" parameterType="objectMap"
+		resultMap="chargeTempCostResultMap">
+		SELECT
+		t.prepay_bill,
+		t.income_bill,
+		t.real_bill,
+		t.entry_lane,
+		t.entry_time,
+		t.vehicle_class,
+		t.mv_license,
+		t.car_color,
+		t.is_rebate,
+		t.pay_time,
+		t.pay_status,
+		t.entry_image,
+		t.pay_method,
+		t.card_network,
+		t.card_id,
+		t.obu_id
+		FROM temp_cost t
+		where
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d %H:%i:%s') = DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id = #{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and t.area_id = #{area_id}
+		</if>
+		and t.entry_lane=#{entry_lane}
+	</select>
+	
+	<!-- 查询临时计费 -->
+	<select id="countTempCostByLaneTime" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		FROM temp_cost t
+		where 
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d %H:%i:%s') = DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id = #{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and t.area_id = #{area_id}
+		</if>
+		and t.entry_lane=#{entry_lane}
+	</select>
+	
+	
+	
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.finance.InvoiceInfoMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM invoice_info t
+		 WHERE 1=1
+		 <if test="query_flag!=null and query_flag!=''">
+		 and flag=#{query_flag}
+		 </if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.platuser.finance.InvoiceInfoMng.model.InvoiceInfoBean">
+    	SELECT 
+			t.sn,
+			t.code,
+			t.begin_number,
+			t.end_number,
+				
+			t.flag,
+			t.count,
+			t.user_id,
+			t.begin_time,
+				
+			t.cancel_record,
+			t.cancel_time,
+			t.cancel_user_id,
+			t.s_comment
+				
+		  FROM invoice_info t
+		 WHERE 1=1
+		 <if test="query_flag!=null and query_flag!=''">
+		 and flag=#{query_flag}
+		 </if>
+		ORDER BY t.begin_time desc
+    </select>
+    
+    
+    
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.platuser.finance.InvoiceInfoMng.model.InvoiceInfoBean">
+    	INSERT INTO invoice_info(
+<!-- 				sn, -->
+				code,
+				begin_number,
+				end_number,
+			
+				flag,
+				count,
+				user_id,
+				begin_time,
+			
+				cancel_record,
+				cancel_time,
+				cancel_user_id,
+				s_comment
+			
+				)
+		VALUES(
+<!-- 				#{sn} , -->
+				#{code} ,
+				#{begin_number} ,
+				#{end_number} ,
+			
+				#{flag} ,
+				#{count} ,
+				#{user_id} ,
+				now() ,
+			
+				#{cancel_record} ,
+				#{cancel_time} ,
+				#{cancel_user_id} ,
+				#{s_comment} 
+			
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.platuser.finance.InvoiceInfoMng.model.InvoiceInfoBean">
+        SELECT 
+			t.sn,
+			t.code,
+			t.begin_number,
+			t.end_number,
+				
+			t.flag,
+			t.count,
+			t.user_id,
+			t.begin_time,
+				
+			t.cancel_record,
+			t.cancel_time,
+			t.cancel_user_id,
+			t.s_comment
+				
+		  FROM invoice_info t
+        WHERE t.sn=#{VALUE}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.platuser.finance.InvoiceInfoMng.model.InvoiceInfoBean">
+		UPDATE invoice_info
+		SET 
+			sn=#{sn} ,
+			code=#{code} ,
+			begin_number=#{begin_number} ,
+			end_number=#{end_number} ,
+			
+			flag=#{flag} ,
+			count=#{count} ,
+			user_id=#{user_id} ,
+			begin_time=#{begin_time} ,
+			
+			cancel_record=#{cancel_record} ,
+			cancel_time=#{cancel_time} ,
+			cancel_user_id=#{cancel_user_id} ,
+			s_comment=#{s_comment} 
+			
+		WHERE sn=#{sn}
+    </update>
+	
+    <update id="delete" parameterType="String">
+    	delete from invoice_info
+		 WHERE sn = #{value}
+    </update>
+</mapper>

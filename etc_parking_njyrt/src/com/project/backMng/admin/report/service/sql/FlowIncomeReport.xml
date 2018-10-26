@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.FlowIncomeReport">
+	<resultMap id="flowIncomeReportTempResultMap" type="flowIncomeReportTempBean">
+		<id column="date" property="date" jdbcType="INTEGER" />
+		<id column="lane_id" property="laneId" jdbcType="INTEGER" />
+		<id column="lane_flag" property="laneFlag" jdbcType="INTEGER" />
+		<result column="park_id" property="parkId" jdbcType="VARCHAR" />
+		<result column="area_id" property="areaId" jdbcType="VARCHAR" />
+		<result column="vehicleclass" property="vehicleclass" jdbcType="INTEGER" />
+		<result column="paymethod" property="paymethod" jdbcType="INTEGER" />
+		<result column="cardnetwork" property="cardnetwork" jdbcType="INTEGER" />
+		<result column="ecardtype" property="ecardtype" jdbcType="INTEGER" />
+		<result column="count_flow" property="countFlow" jdbcType="INTEGER" />
+	</resultMap>
+
+	<!-- 查询总数量 -->
+	<select id="findCountFlowReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1) FROM (
+		SELECT 1
+		FROM cur_entry t
+		WHERE t.recordtype = 3
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+		GROUP BY t.entrydate,t.entrylane) as tmp
+	</select>
+
+	<!-- 查询总数量 -->
+	<select id="findCountExitFlowReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1) FROM (
+		SELECT 1
+		FROM cur_exit t
+		WHERE t.recordtype = 3
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+		GROUP BY t.exitdate,t.exitlane) as tmp
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findListFlowReport" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.FlowIncomeReportBean">
+		SELECT t.entrydate date,t.entrylane laneId,
+		p.park_name
+		parkName,a.area_name areaName,1 laneFlag
+		FROM cur_entry t
+		LEFT JOIN
+		lane_info l
+		on l.lane_id = t.entrylane AND l.delete_flag = 0
+		LEFT JOIN
+		park_info p on p.park_id = l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN
+		area_info a on a.area_id = l.area_id AND a.park_id = l.park_id
+		AND
+		a.delete_flag = 0
+		WHERE t.recordtype=3
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		GROUP BY t.entrydate,t.entrylane
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findListExitFlowReport" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.FlowIncomeReportBean">
+		SELECT t.exitdate date,t.exitlane laneId,
+		p.park_name
+		parkName,a.area_name areaName,2 laneFlag
+		FROM cur_exit t
+		LEFT JOIN
+		lane_info l
+		on l.lane_id = t.exitlane AND l.delete_flag = 0
+		LEFT JOIN
+		park_info p on p.park_id = l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN
+		area_info a on a.area_id = l.area_id AND a.park_id = l.park_id
+		AND
+		a.delete_flag = 0
+		WHERE t.recordtype=3
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		GROUP BY t.exitdate,t.exitlane
+	</select>
+
+	<!-- 查询出口流量数据列表 -->
+	<select id="findListFlowReportDetail" parameterType="objectMap"
+		resultMap="flowIncomeReportTempResultMap">
+		SELECT t.entrydate date,t.entrylane lane_id,1
+		lane_flag,t.vehicleclass,t.paymethod,
+		t.ecardtype as ecardtype,count(1)
+		count_flow
+		FROM cur_entry t
+		WHERE t.recordtype=3
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		GROUP BY t.entrydate,t.entrylane,t.vehicleclass,
+		t.paymethod,t.ecardtype
+	</select>
+
+	<!-- 查询出口流量数据列表 -->
+	<select id="findListExitFlowReportDetail" parameterType="objectMap"
+		resultMap="flowIncomeReportTempResultMap">
+		SELECT t.exitdate date,t.exitlane lane_id,1
+		lane_flag,t.vehicleclass,t.paymethod,
+		t.ecardtype as ecardtype,count(1)
+		count_flow
+		FROM cur_exit t
+		WHERE t.recordtype=3
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		GROUP BY t.exitdate,t.exitlane,t.vehicleclass,
+		t.paymethod,t.ecardtype
+	</select>
+
+	<!-- 更新流量的信息 -->
+	<update id="updateFlowReport"
+		parameterType="com.project.backMng.admin.report.model.FlowIncomeReportBean">
+		UPDATE flow_report
+		SET
+		car_store_value=#{carStoreValue} ,
+		car_account=#{carAccount} ,
+		car_mobile=#{carMobile},
+		car_cash=#{carCash},
+		cart_store_value=#{cartStoreValue},
+		cart_account =
+		#{cartAccount},
+		cart_cash=#{cartCash}
+		WHERE date=#{date}
+		AND
+		lane_id=#{laneId}
+		AND lane_flag=#{laneFlag}
+	</update>
+
+	<!-- 新增流量的信息 -->
+	<insert id="insertFlowReport"
+		parameterType="com.project.backMng.admin.report.model.FlowIncomeReportBean">
+		INSERT INTO flow_report(
+		date,
+		lane_id,
+		lane_flag,
+		car_store_value,
+		car_account,
+		car_mobile,
+		car_cash,
+		cart_store_value,
+		cart_account,
+		cart_mobile,
+		cart_cash
+		)
+		VALUES(
+		#{date} ,
+		#{laneId} ,
+		#{laneFlag} ,
+		#{carStoreValue} ,
+		#{carAccount} ,
+		#{carMobile} ,
+		#{carCash} ,
+		#{cartStoreValue} ,
+		#{cartAccount} ,
+		#{cartMobile} ,
+		#{cartCash}
+		)
+	</insert>
+
+
+
+	<!-- 删除流量信息 -->
+	<delete id="deleteFlowReport" parameterType="objectMap">
+		delete from
+		flow_report
+	</delete>
+
+
+	<!-- 查询停车场所有列表信息 -->
+	<select id="findParkInfoList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+		SELECT
+		t.park_id,
+		t.park_name
+		FROM park_info t
+		WHERE delete_flag=0
+		<if test="query_park_id!=null and query_park_id!=''">
+			and park_id = #{query_park_id}
+		</if>
+	</select>
+
+
+	<!-- 查询区域信息列表 -->
+	<select id="findAreaInfoList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		SELECT
+		t.area_id,
+		t.park_id,
+		t.area_name
+		FROM area_info t
+		WHERE
+		delete_flag=0
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id=#{park_id}
+		</if>
+		<if test="query_area_id!=null and query_area_id!=''">
+			and t.area_id = #{area_id}
+		</if>
+	</select>
+
+	<!-- 查询车道数据列表 -->
+	<select id="findLaneInfoList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+		SELECT
+		t.park_id,
+		t.area_id,
+		t.lane_id,
+		t.lane_flag,
+		t.lane_name
+		FROM
+		lane_info t
+		WHERE t.delete_flag=0
+		<if test="park_id!=null and park_id!=''">
+			and
+			t.park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and
+			t.area_id=#{area_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and t.lane_id = #{query_lane_id}
+		</if>
+		<if test="QUERY_LANE_FLAG!=null and QUERY_LANE_FLAG!=''">
+			and t.lane_flag=#{QUERY_LANE_FLAG}
+		</if>
+	</select>
+
+	<select id="findTollReport" parameterType="objectMap"
+		statementType="CALLABLE"
+		resultType="com.project.backMng.admin.report.model.TollLineChartBean">
+		CALL proc_toll_report(#{start_time},#{end_time},#{type})
+	</select>
+
+	
+	<select id="findEntryFlowReport" parameterType="objectMap"
+		statementType="CALLABLE"
+		resultType="com.project.backMng.admin.report.model.FlowLineChartBean">
+		CALL proc_entry_flow_report(#{start_time},#{end_time},#{type})
+	</select>
+	
+	<select id="findExitFlowReport" parameterType="objectMap"
+		statementType="CALLABLE"
+		resultType="com.project.backMng.admin.report.model.FlowLineChartBean">
+		CALL proc_exit_flow_report(#{start_time},#{end_time},#{type})
+	</select>
+
+	<!-- 根据与今天的差值查询入口、出口流量和收入数据 -->
+	<select id="findFlowIncomeInfo" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.FlowIncomeBaseBean">
+	    SELECT 
+		(select
+		count(1) from cur_entry en where (to_days(now()) -
+		to_days(en.entrytime)) = #{to_today}
+		AND en.recordtype = 3) entry_flow,(select
+		count(1) from cur_exit ex where (to_days(now()) -
+		to_days(ex.exittime)) = #{to_today}
+		AND ex.recordtype = 3) exit_flow,sum(t.totaltoll) income
+		FROM cur_exit t WHERE (to_days(now()) - to_days(t.exittime)) = #{to_today}
+		AND t.recordtype = 3 AND paymethod in(0,2,3,4,8)
+	</select>
+
+
+	<!-- 获取失败识别车牌的个数 -->
+	<select id="countFailRecognition" parameterType="objectMap"
+		resultType="Integer">
+		SELECT
+		((SELECT count(1)
+		FROM cur_exit ex WHERE
+		(to_days(now()) - to_days(ex.exittime))
+		= #{to_today}
+		AND ex.recordtype = 3 AND ex.mvlicense like '%无牌车%')+(SELECT
+		count(1)
+		FROM cur_entry en WHERE
+		(to_days(now()) -
+		to_days(en.entrytime)) = #{to_today}
+		AND en.recordtype = 3 AND
+		en.mvlicense like '%无牌车%'))
+		FROM DUAL
+	</select>
+
+<!-- pc端报表，运营明细查询 -->
+	<select id="findParkRunDetail" parameterType="objectMap"
+		statementType="CALLABLE"
+		resultType="com.project.backMng.admin.report.model.ParkRunDetailBean">
+		CALL proc_running_detail_report(#{type},#{cycle},#{freeTime})
+	</select>
+
+<!-- pc端报表，运营明细查询 -->
+	<select id="findParkStock" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.StockReportBean">
+		SELECT park_id,area_id,totalspace,tmpcar,fixcar,updatetime FROM stock
+	</select>
+
+
+</mapper>

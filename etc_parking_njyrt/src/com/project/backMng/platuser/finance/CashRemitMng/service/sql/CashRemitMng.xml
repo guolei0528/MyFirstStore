@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.finance.CashRemitMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM cash_remit t
+		WHERE 1=1
+		<if test="query_operator_id!=null and query_operator_id!=''">
+			and t.operator_id like CONCAT('%',#{query_operator_id},'%')
+		</if>
+		<if test="create_time_from!=null and create_time_from!=''">
+			and t.create_time<![CDATA[>=]]>#{create_time_from}
+		</if>
+		<if test="create_time_to!=null and create_time_to!=''">
+			and t.create_time<![CDATA[<=]]>#{create_time_to}
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.finance.CashRemitMng.model.CashRemitBean">
+		SELECT
+		DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') create_time,
+		t.date,
+		t.remit_type,
+		t.user_id,
+    (select name from user where user.delete_flag = 0 and user.user_id = t.user_id) user_name,
+    t.park_id,
+		t.area_id,
+		t.lane_id,
+    (select p.park_name from park_info p where p.delete_flag = 0 and p.park_id = t.park_id) park_name,
+    case  when remit_type=1 then 
+    (select a.area_name from area_info a where a.delete_flag = 0 and a.park_id = t.park_id and a.area_id = t.area_id) end as area_name,
+    case when remit_type=1 then 
+    (select l.lane_name from lane_info l where l.delete_flag = 0 and l.park_id = t.park_id 
+     and l.area_id = t.area_id and l.lane_id = t.lane_id) end as lane_name,	
+		t.operator_shift,
+		t.total_flow_count,
+		t.total_flow,
+		t.receivable_toll_count,
+		t.receivable_toll,
+		t.receipts_toll_count,
+		t.receipts_toll,
+		t.free_flow,
+		t.free_toll,
+		t.discount_flow,
+		t.invoice_count,
+		t.discount_toll,
+		t.cancel_flow,
+		t.cancel_toll,
+		t.check_status,
+		t.check_user,
+		t.check_time,
+		t.remit_user,
+		t.remit_time,
+		t.remit_toll,
+		t.balance_toll,
+		t.remit_status,
+		t.delete_mark,
+		t.remark,
+		t.spare1,
+		t.spare2,
+		t.spare3,
+		t.spare4
+		FROM cash_remit t
+		WHERE 1=1
+		<if test="query_operator_id!=null and query_operator_id!=''">
+			and t.operator_id like CONCAT('%',#{query_operator_id},'%')
+		</if>
+		<if test="create_time_from!=null and create_time_from!=''">
+			and t.create_time<![CDATA[>=]]>#{create_time_from}
+		</if>
+		<if test="create_time_to!=null and create_time_to!=''">
+			and t.create_time<![CDATA[<=]]>#{create_time_to}
+		</if>
+		ORDER BY t.create_time desc
+	</select>
+	
+	
+	<select id="findInfo" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.finance.CashRemitMng.model.CashRemitBean">
+		SELECT
+		DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') create_time,
+		t.date,
+		t.remit_type,
+		t.user_id,
+    (select name from user where user.delete_flag = 0 and user.user_id = t.user_id) user_name,
+    t.park_id,
+		t.area_id,
+		t.lane_id,
+    (select p.park_name from park_info p where p.delete_flag = 0 and p.park_id = t.park_id) park_name,
+    case  when remit_type=1 then 
+    (select a.area_name from area_info a where a.delete_flag = 0 and a.park_id = t.park_id and a.area_id = t.area_id) end as area_name,
+    case when remit_type=1 then 
+    (select l.lane_name from lane_info l where l.delete_flag = 0 and l.park_id = t.park_id 
+     and l.area_id = t.area_id and l.lane_id = t.lane_id) end as lane_name,	
+		t.operator_shift,
+		t.total_flow_count,
+		t.total_flow,
+		t.receivable_toll_count,
+		t.receivable_toll,
+		t.receipts_toll_count,
+		t.receipts_toll,
+		t.free_flow,
+		t.free_toll,
+		t.discount_flow,
+		t.invoice_count,
+		t.discount_toll,
+		t.cancel_flow,
+		t.cancel_toll,
+		t.check_status,
+		t.check_user,
+		t.check_time,
+		t.remit_user,
+		t.remit_time,
+		t.remit_toll,
+		t.balance_toll,
+		t.remit_status,
+		t.delete_mark,
+		t.remark,
+		t.spare1,
+		t.spare2,
+		t.spare3,
+		t.spare4
+		FROM cash_remit t
+		WHERE t.create_time=#{create_time}
+		and t.user_id=#{user_id}
+	</select>
+	
+	
+	
+	
+</mapper>

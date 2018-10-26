@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.coupon.CouponMng">
+        
+    <!-- <resultMap id="couponCodeStatus" type="HashMap">  
+    <result property="key" column="coupon_code" />  
+    <result property="value" column="status" />  
+	</resultMap> -->  
+	
+    <insert id="insertCoupon" parameterType="com.project.backMng.admin.coupon.model.CouponMngBean">
+    	INSERT INTO coupon(
+			coupon_type,
+			use_restrict,
+			issuer_code,
+			issue_date,
+			batch_id,
+			verify_code,
+			coupon_toll,
+			coupon_code,
+			start_time,
+			end_time,
+			issuer_id,
+			status,
+			create_user,
+			create_time)
+		VALUES(
+				#{coupon_type} ,
+				#{use_restrict} ,
+				#{issuer_code} ,
+				#{issue_date} ,
+				#{batch_id} ,
+				#{verify_code} ,
+				#{coupon_toll} ,
+				#{coupon_code} ,
+				#{start_time} ,
+				#{end_time} ,
+				#{issuer_id} ,
+				#{status} ,
+				#{create_user} ,
+				#{create_time}
+		)
+    </insert>
+    
+    
+    
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.admin.coupon.model.CouponMngBean">
+		SELECT
+			t.coupon_type,
+			t.use_restrict,
+			t.issuer_code,
+			(select ci.issuer_name from coupon_issuer ci where t.issuer_code=ci.issuer_code) issuer_name,
+			t.issue_date,
+			t.batch_id,
+			t.verify_code,
+			t.coupon_toll,
+			t.coupon_code,
+			t.start_time,
+			t.end_time,
+			t.issuer_id,
+			t.status,
+			t.create_user,
+			t.create_time
+			from coupon t
+			WHERE 1=1 
+		<if test="query_coupon_code!=null and query_coupon_code!=''">
+				AND t.coupon_code like CONCAT('%', #{query_coupon_code}, '%')
+		</if>
+		 <if test="query_issuer_code!=null and query_issuer_code!=''">
+				AND t.issuer_code like CONCAT('%', #{query_issuer_code}, '%')
+		</if>
+		 <if test="query_issue_date!=null">
+				AND t.issue_date = #{query_issue_date}
+		</if>
+		 <if test="query_batch_id!=null">
+				AND t.batch_id like CONCAT('%', #{query_batch_id}, '%')
+		</if>
+		<if test="query_start_time!=null and query_start_time!=''">
+			and t.start_time = DATE_FORMAT(#{query_start_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="query_end_time!=null and query_end_time!=''">
+			and t.end_time = DATE_FORMAT(#{query_end_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		 <if test="query_coupon_type!=null and query_coupon_type!=''">
+				AND t.coupon_type = #{query_coupon_type}
+		</if>
+		<if test="query_status!=null">
+				AND t.status = #{query_status}
+		</if>
+		order by t.coupon_code desc
+	</select>
+    
+    
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM coupon t
+		WHERE 1=1 
+		<if test="query_coupon_code!=null and query_coupon_code!=''">
+				AND t.coupon_code like CONCAT('%', #{query_coupon_code}, '%')
+		</if>
+		 <if test="query_issuer_code!=null and query_issuer_code!=''">
+				AND t.issuer_code like CONCAT('%', #{query_issuer_code}, '%')
+		</if>
+		 <if test="query_issue_date!=null">
+				AND t.issue_date = #{query_issue_date}
+		</if>
+		 <if test="query_batch_id!=null">
+				AND t.batch_id like CONCAT('%', #{query_batch_id}, '%')
+		</if>
+		<if test="query_start_time!=null and query_start_time!=''">
+			and t.start_time = DATE_FORMAT(#{query_start_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="query_end_time!=null and query_end_time!=''">
+			and t.end_time = DATE_FORMAT(#{query_end_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		 <if test="query_coupon_type!=null and query_coupon_type!=''">
+				AND t.coupon_type = #{query_coupon_type}
+		</if>
+		<if test="query_status!=null">
+				AND t.status = #{query_status}
+		</if>
+	</select>
+		
+	<select id="findInfo" parameterType="String" resultType="com.project.backMng.admin.coupon.model.CouponMngBean">
+		SELECT
+			t.coupon_type,
+			t.use_restrict,
+			t.station_id,
+			t.station_name,
+			t.issuer_code,
+			(select ci.issuer_name from coupon_issuer ci where t.issuer_code=ci.issuer_code) issuer_name,
+			t.issue_date,
+			t.batch_id,
+			t.verify_code,
+			t.coupon_toll,
+			t.coupon_code,
+			t.start_time,
+			t.end_time,
+			t.issuer_id,
+			t.status,
+			t.create_user,
+			(select name from user u where t.create_user = u.user_id) user_name,
+			t.create_time
+		FROM coupon t
+		WHERE t.verify_code=#{verify_code}
+	</select>
+    
+    
+    
+    <!-- 查询数据列表 -->
+    <select id="searchCouponCodeByBatch" parameterType="objectMap" resultType="String">
+    	SELECT coupon_code
+		  FROM coupon t
+		 WHERE 1=1 
+		 <if test="query_coupon_code!=null and query_coupon_code!=''">
+				AND t.coupon_code like CONCAT('%', #{query_coupon_code}, '%')
+		</if>
+		 <if test="query_issuer_code!=null and query_issuer_code!=''">
+				AND t.issuer_code like CONCAT('%', #{query_issuer_code}, '%')
+		</if>
+		 <if test="query_issue_date!=null">
+				AND t.issue_date = #{query_issue_date}
+		</if>
+		 <if test="query_batch_id!=null">
+				AND t.batch_id like CONCAT('%', #{query_batch_id}, '%')
+		</if>
+		<if test="query_start_time!=null and query_start_time!=''">
+			and t.start_time = DATE_FORMAT(#{query_start_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="query_end_time!=null and query_end_time!=''">
+			and t.end_time = DATE_FORMAT(#{query_end_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		 <if test="query_coupon_type!=null">
+				AND t.coupon_type = #{query_coupon_type}
+		</if>
+		<if test="query_status!=null">
+				AND t.status = #{query_status}
+		</if>
+		<if test="query_use_restrict!=null">
+		       AND t.use_restrict = #{query_use_restrict}
+		</if>
+		ORDER BY t.create_time desc
+    </select>
+    
+    
+      
+    <!-- 查询数据列表 -->
+    <select id="countByVerifyCode" parameterType="String" resultType="INTEGER">
+    	SELECT count(1)
+		  FROM coupon t
+		 WHERE t.verify_code = #{verify_code}
+    </select>
+    
+    
+    <!-- 更新优惠券的状态 -->
+	<update id="invaildBetweenCouponCode" parameterType="objectMap">
+		UPDATE coupon 
+		SET status=#{status}
+		WHERE status in (0,1)
+		and coupon_code <![CDATA[>=]]> #{invaild_start_coupon,jdbcType=VARCHAR}
+		and coupon_code like CONCAT(#{invaild_batch,jdbcType=VARCHAR}, '%')
+		order by coupon_code asc 
+		limit #{invaild_coupon_num,jdbcType=INTEGER}
+	</update>
+	
+	
+	<!-- 更新优惠券的状态 -->
+	<update id="invaildById" parameterType="objectMap">
+		UPDATE coupon 
+		SET status=#{status}
+		WHERE status in (0,1)
+		and coupon_code <![CDATA[>=]]> #{invaild_start_coupon}
+		and coupon_code <![CDATA[<=]]> #{invaild_end_coupon}
+	</update>
+	
+    <!-- 检查是否存在  -->
+    <select id="countVaildByBatch" parameterType="objectMap" resultType="INTEGER"> 
+    	SELECT count(1)
+		FROM coupon t
+		WHERE 
+		status != 2
+		and coupon_type=#{coupon_type}
+		and use_restrict=#{use_restrict}
+		and issuer_code=#{issuer_code}
+		and issue_date=#{issue_date}
+		and batch_id=#{batch_id}
+    </select>
+    
+    
+    <!-- 更新优惠券的状态 -->
+	<update id="invaildCoupon" parameterType="objectMap">
+		UPDATE coupon
+		SET status=#{status}
+		WHERE 
+		status in (0,1)
+		and coupon_type=#{coupon_type}
+		and use_restrict=#{use_restrict}
+		and issuer_code=#{issuer_code}
+		and issue_date=#{issue_date}
+		and batch_id=#{batch_id}
+	</update>
+	
+	 <!-- 检查是否存在优惠券  -->
+    <select id="existsVaildByBatch" parameterType="objectMap" resultType="INTEGER"> 
+    	SELECT count(1)
+		FROM coupon t
+		WHERE 
+	    coupon_type=#{coupon_type}
+		and use_restrict=#{use_restrict}
+		and issuer_code=#{issuer_code}
+		and issue_date=#{issue_date}
+		and batch_id=#{batch_id}
+    </select>
+	
+	 <!-- 更新优惠券的状态 -->
+	<update id="invaildManyCouponByCode" parameterType="objectMap">
+		UPDATE coupon
+		SET status=#{status}
+		WHERE 
+		status in (0,1)
+		<foreach collection="invaild_coupon" separator=" or " item="item" index="idx" open="and (" close=")">
+            coupon_code = #{item,jdbcType=VARCHAR}
+    	</foreach>
+	</update>
+	
+</mapper>

@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.whiteList.WhiteListMng">
+
+	<!-- 查询数据列表 -->
+	<select id="findWhiteList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.color,
+		t.obu_id,
+		t.vehicle_class,
+		t.toll_type,
+		t.charge_code,
+		t.user_name,
+		t.phone,
+		t.gender,
+		t.user_number,
+		t.dept_id,
+		t.dept_info,
+		t.job,
+		t.job_type,
+		t.s_comment,
+		t.status,
+		t.initiate_id,
+		t.valid_start_time,
+		t.valid_end_time,
+		t.create_time,
+		t.toll_type,
+		t.lane_info,
+		t.spare1,
+		t.spare2,
+		t.spare3
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		and t.mv_license = #{mv_license}
+		and t.color = #{color}
+		and t.create_time = #{create_time}
+	</select>
+	
+	
+	<!-- 查询数据列表 -->
+	<select id="findWhiteListForEdit" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.color,
+		t.obu_id,
+		t.vehicle_class,
+		t.toll_type,
+		t.charge_code,
+		t.user_name,
+		t.phone,
+		t.gender,
+		t.user_number,
+		t.dept_id,
+		t.dept_info,
+		t.job,
+		t.job_type,
+		t.s_comment,
+		t.status,
+		t.initiate_id,
+		t.valid_start_time,
+		t.valid_end_time,
+		t.create_time,
+		t.toll_type,
+		t.lane_info,
+		t.spare1,
+		t.spare2,
+		t.spare3
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		and t.mv_license = #{old_mv_license}
+		and t.color = #{old_color}
+		and t.create_time = #{create_time}
+	</select>
+	
+
+
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		AND t.status in (1,2,3,4,5,7)
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+
+		<if test="query_user_name!=null and query_user_name!=''">
+			AND t.user_name like CONCAT('%', #{query_user_name},
+			'%')
+		</if>
+		<if test="query_user_number!=null and query_user_number!=''">
+			AND t.user_number like CONCAT('%', #{query_user_number},
+			'%')
+		</if>
+		
+		<if test="query_phone!=null and query_phone!=''">
+			AND t.phone like CONCAT('%', #{query_phone},
+			'%')
+		</if>
+
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.color,
+		t.obu_id,
+		t.vehicle_class,
+		t.lane_info,
+		t.user_name,
+		t.phone,
+		t.gender,
+		t.user_number,
+		t.dept_id,
+		t.dept_info,
+		t.job_type,
+		t.status,
+		t.initiate_id,
+		t.valid_start_time,
+		t.valid_end_time,
+		t.create_time,
+		t.toll_type,
+		t.charge_code,
+		(
+		select a.name from user a where a.user_id = t.initiate_id and a.delete_flag
+		= 0
+		) initiate_name,
+		(
+		select b.name from user b where b.user_id = t.comfirm_id and b.delete_flag =
+		0
+		) comfirm_name,
+		(
+		select a.name from user a where a.user_id = t.invalid_initiate_id and a.delete_flag
+		= 0
+		) invalid_initiate_name,
+		(
+		select b.name from user b where b.user_id = t.invalid_comfirm_id and b.delete_flag =
+		0
+		) invalid_comfirm_name,
+		t.spare1,
+		t.spare2,
+		t.spare3
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		AND t.status in (1,2,3,4,5,7)
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+		
+		<if test="query_user_name!=null and query_user_name!=''">
+			AND t.user_name like CONCAT('%', #{query_user_name},
+			'%')
+		</if>
+		<if test="query_user_number!=null and query_user_number!=''">
+			AND t.user_number like CONCAT('%', #{query_user_number},
+			'%')
+		</if>
+
+		<if test="query_phone!=null and query_phone!=''">
+			AND t.phone like CONCAT('%', #{query_phone},
+			'%')
+		</if>
+		
+		ORDER BY t.initiate_time desc
+	</select>
+
+	<!-- 查询总数量 -->
+	<select id="comfirmFindCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		AND t.status in (1,5)
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+	
+	
+		<if test="query_user_name!=null and query_user_name!=''">
+			AND t.user_name like CONCAT('%', #{query_user_name},
+			'%')
+		</if>
+		<if test="query_user_number!=null and query_user_number!=''">
+			AND t.user_number like CONCAT('%', #{query_user_number},
+			'%')
+		</if>
+		<if test="query_phone!=null and query_phone!=''">
+			AND t.phone like CONCAT('%', #{query_phone},
+			'%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 --> 
+	<select id="comfirmFindList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.color,
+		t.obu_id,
+		t.vehicle_class,
+		t.user_name,
+		t.phone,
+		t.gender,
+		t.user_number,
+		t.toll_type,
+		t.dept_id,
+		t.dept_info,
+		t.job_type,
+		t.status,
+		t.initiate_id,
+		t.valid_start_time,
+		t.valid_end_time,
+		t.lane_info,
+		t.create_time,
+		(
+		select a.name from user a where a.user_id = t.initiate_id and a.delete_flag
+		= 0
+		) initiate_name,
+		(
+		select b.name from user b where b.user_id = t.comfirm_id and b.delete_flag =
+		0
+		) comfirm_name,
+		(
+		select a.name from user a where a.user_id = t.invalid_initiate_id and a.delete_flag
+		= 0
+		) invalid_initiate_name,
+		(
+		select b.name from user b where b.user_id = t.invalid_comfirm_id and b.delete_flag =
+		0
+		) invalid_comfirm_name,
+		t.spare1
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		AND t.status in (1,5)
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			AND t.mv_license like CONCAT('%', #{query_mv_license},
+			'%')
+		</if>
+		<if test="query_user_name!=null and query_user_name!=''">
+			AND t.user_name like CONCAT('%', #{query_user_name},
+			'%')
+		</if>
+		<if test="query_user_number!=null and query_user_number!=''">
+			AND t.user_number like CONCAT('%', #{query_user_number},
+			'%')
+		</if>
+		<if test="query_phone!=null and query_phone!=''">
+			AND t.phone like CONCAT('%', #{query_phone},
+			'%')
+		</if>
+		ORDER BY t.initiate_time asc
+	</select>
+
+
+
+	<!-- 查询数量 -->
+	<select id="countWhiteList" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		<if test="mv_license!=null and mv_license!=''">
+			AND t.mv_license = #{mv_license}
+		</if>
+		<if test="color!=null and color!=''">
+			AND t.color = #{color}
+		</if>
+		<if test="obu_id!=null and obu_id!=''">
+			AND t.obu_id = #{obu_id}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND t.vehicle_class = #{vehicle_class}
+		</if>
+		<if test="create_time!=null and create_time!=''">
+			AND t.create_time = #{create_time}
+		</if>
+	</select>
+	
+	
+		<!-- 更新项目的信息 -->
+	<update id="updateWhiteList" parameterType="objectMap">
+		UPDATE
+		white_list
+		SET
+		mv_license=#{mv_license},
+		color=#{color},
+		vehicle_class=#{vehicle_class},
+		initiate_id=#{initiate_id},
+		initiate_time=now(),
+		user_name=#{user_name},
+		gender=#{gender},
+		user_number=#{user_number},
+		phone=#{phone},
+		s_comment=#{s_comment},
+		spare1=#{spare1},
+		toll_type=#{toll_type},
+		charge_code=#{charge_code},
+		valid_start_time=#{valid_start_time},
+		valid_end_time=#{valid_end_time},
+		status=#{status}
+		WHERE create_time=#{create_time}
+		AND mv_license=#{old_mv_license} 
+		AND color=#{old_color} 
+		AND delete_flag = 0
+		
+	</update>
+	
+	<!-- 更新项目的信息 -->
+	<update id="updateWhiteListPersonInfo" parameterType="objectMap">
+		UPDATE
+		white_list
+		SET
+		mv_license=#{mv_license},
+		color=#{color},
+
+		<if test="valid_start_time!=null">
+		valid_start_time = #{valid_start_time},
+		</if>
+		<if test="valid_end_time!=null">
+		valid_end_time = #{valid_end_time},
+		</if>
+		vehicle_class=#{vehicle_class},
+		toll_type=#{toll_type},
+		charge_code=#{charge_code},
+		user_name=#{user_name},
+		gender=#{gender},
+		user_number=#{user_number},
+		phone=#{phone},
+		s_comment=#{s_comment},
+		spare1=#{spare1}
+		
+		<!-- lane_info=#{lane_info} -->
+		WHERE create_time=#{create_time}
+		AND mv_license=#{old_mv_license} 
+		AND color=#{old_color} 
+		AND delete_flag = 0
+	</update>
+
+
+	<!-- 更新项目的信息 -->
+	<update id="updateWhiteListByLicense" parameterType="com.project.backMng.admin.sys.model.UserBean">
+		UPDATE
+		white_list
+		SET
+		initiate_id=#{initiate_id} ,
+		initiate_time=now(),
+		status=#{status}
+		WHERE create_time=#{create_time}
+		AND mv_license=#{mv_license} AND delete_flag = 0
+	</update>
+
+
+	<!-- 增加白名单 -->
+	<insert id="insertWhiteList" parameterType="objectMap">
+		INSERT INTO
+		white_list(mv_license, color, obu_id,
+		vehicle_class,initiate_id,initiate_time,
+		<if test="comfirm_id!=null and comfirm_id!=''">
+			comfirm_id,
+		</if>
+		<if test="comfirm_time!=null">
+			comfirm_time,
+		</if>
+		<if test="user_name!=null and user_name!=''">
+			user_name,
+		</if>
+		<if test="gender!=null and gender!=''">
+			gender,
+		</if>
+		<if test="user_number!=null and user_number!=''">
+			user_number,
+		</if>
+		<if test="phone!=null and phone!=''">
+			phone,
+		</if>
+		<if test="job!=null and job!=''">
+			job,
+		</if>
+		<if test="job_type!=null and job_type!=''">
+			job_type,
+		</if>
+		<if test="dept_id!=null and dept_id!=''">
+			dept_id,
+		</if>
+		<if test="dept_info!=null and dept_info!=''">
+			dept_info,
+		</if>
+		<if test="s_comment!=null and s_comment!=''">
+			s_comment,
+		</if>
+		<if test="toll_type!=null and toll_type!=''">
+			toll_type,
+		</if>
+		<if test="charge_code!=null and charge_code!=''">
+			charge_code,
+		</if>
+		<if test="car_brand!=null and car_brand!=''">
+			car_brand,
+		</if>
+		<if test="lane_info!=null and lane_info!=''">
+			lane_info,
+		</if>
+		<if test="spare2!=null">
+			spare2,
+		</if>
+		<if test="spare1!=null">
+			spare1,
+		</if>
+		delete_flag,
+		create_time,status,valid_start_time,valid_end_time,is_display
+		)
+		VALUES
+		(#{mv_license}, #{color},
+		#{obu_id},#{vehicle_class},
+		#{initiate_id},#{initiate_time},
+		<if test="comfirm_id!=null and comfirm_id!=''">
+			#{comfirm_id},
+		</if>
+		<if test="comfirm_time!=null">
+			#{comfirm_time},
+		</if>
+		<if test="user_name!=null and user_name!=''">
+			#{user_name},
+		</if>
+		<if test="gender!=null and gender!=''">
+			#{gender},
+		</if>
+		<if test="user_number!=null and user_number!=''">
+			#{user_number},
+		</if>
+		<if test="phone!=null and phone!=''">
+			#{phone},
+		</if>
+		<if test="job!=null and job!=''">
+			#{job},
+		</if>
+		<if test="job_type!=null and job_type!=''">
+			#{job_type},
+		</if>
+		<if test="dept_id!=null and dept_id!=''">
+			#{dept_id},
+		</if>
+		<if test="dept_info!=null and dept_info!=''">
+			#{dept_info},
+		</if>
+		<if test="s_comment!=null and s_comment!=''">
+			#{s_comment},
+		</if>
+		<if test="toll_type!=null and toll_type!=''">
+			#{toll_type},
+		</if>
+		<if test="charge_code!=null and charge_code!=''">
+			#{charge_code},
+		</if>
+		<if test="car_brand!=null and car_brand!=''">
+			#{car_brand},
+		</if>
+		<if test="lane_info!=null and lane_info!=''">
+			#{lane_info},
+		</if>
+		<if test="spare2!=null">
+			#{spare2},
+		</if>
+		<if test="spare1!=null">
+			#{spare1},
+		</if>
+		0,
+		#{create_time},#{status},#{valid_start_time},#{valid_end_time},1)
+	</insert>
+
+	<!-- 修改白名单状态 -->
+	<update id="updateWhiteListStatus" parameterType="objectMap">
+		UPDATE
+		white_list SET 
+		<if test="initiate_id!=null and initiate_id!=''">
+			initiate_id = #{initiate_id},
+		</if>
+		<if test="initiate_time!=null">
+			initiate_time = #{initiate_time},
+		</if>
+		<if test="comfirm_id!=null and comfirm_id!=''">
+			comfirm_id = #{comfirm_id},
+		</if>
+		<if test="comfirm_time!=null">
+			comfirm_time = #{comfirm_time},
+		</if>
+		<if test="invalid_initiate_id!=null and invalid_initiate_id!=''">
+			invalid_initiate_id = #{invalid_initiate_id},
+		</if>
+		<if test="invalid_initiate_time!=null">
+			invalid_initiate_time = #{invalid_initiate_time},
+		</if>
+		<if test="invalid_comfirm_id!=null and invalid_comfirm_id!=''">
+			invalid_comfirm_id = #{invalid_comfirm_id},
+		</if>
+		<if test="invalid_comfirm_time!=null">
+			invalid_comfirm_time = #{invalid_comfirm_time},
+		</if>
+		
+		<if test="status!=null">
+			status=#{status}
+		</if>
+		WHERE delete_flag = 0 AND
+		create_time = #{create_time}
+		<if test="mv_license!=null and mv_license!=''">
+			AND mv_license = #{mv_license}
+		</if>
+		<if test="color!=null and color!=''">
+			AND color = #{color}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND vehicle_class = #{vehicle_class}
+		</if>
+	</update>
+	
+
+	<!-- 删除白名单车辆信息 -->
+	<delete id="deleteWhiteList" parameterType="objectMap">
+		delete from
+		white_list where mv_license = #{mv_license} AND color = #{color} AND delete_flag = 0
+		AND create_time = #{create_time}
+	</delete>
+	
+	<update id="deleteStatusWhiteList" parameterType="objectMap">
+		UPDATE
+		white_list SET 
+		delete_flag=#{delete_flag},
+		WHERE delete_flag = 0 AND
+		create_time = #{create_time}
+		<if test="mv_license!=null and mv_license!=''">
+			AND mv_license = #{mv_license}
+		</if>
+		<if test="color!=null and color!=''">
+			AND color = #{color}
+		</if>
+		<if test="vehicle_class!=null and vehicle_class!=''">
+			AND vehicle_class = #{vehicle_class}
+		</if>
+		<if test="obu_id!=null and obu_id!=''">
+			AND obu_id = #{obu_id}
+		</if>
+	</update>
+	
+	
+	    <!-- 查询数据列表 -->
+    <select id="findLaneList" resultType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+    	SELECT 
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+			t.lane_flag,
+			t.lane_name,
+			t.spare1,
+			t.spare2,
+			t.spare3,
+			t.spare4,
+			t.s_comment
+		  FROM lane_info t
+		 WHERE t.delete_flag=0
+    </select>
+    
+	<!-- 查询数据列表 -->
+	<select id="findAreaList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		SELECT
+		t.area_id,
+		t.park_id,
+		t.area_name,
+		t.space_number,
+		t.pay_free_time,
+		t.picture_type,
+		t.picture_addr,
+		t.server_ip,
+		t.db_name,
+		t.db_password,
+		t.day_number,
+		t.log_address,
+		t.spare1,
+		t.spare2,
+		t.spare3,
+		t.spare4,
+		t.s_comment
+		FROM area_info t
+		WHERE delete_flag=0
+	</select>
+	
+	    <!-- 查询数据列表 -->
+    <select id="findParkList" resultType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+    	SELECT 
+			t.park_id,
+			t.park_name
+		  FROM park_info t
+			WHERE delete_flag=0
+			and park_id!='0'
+    </select>
+    
+    
+    <!-- 根据用户工号查询用户信息 -->
+	<select id="findWhiteListOfUserNumber" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.user_number,
+		t.user_name,
+		t.spare1,
+		t.spare2,
+		t.gender,
+		t.phone,
+		t.toll_type,
+		t.s_comment
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		and t.user_number = #{usernumber}
+		order by create_time desc
+	</select>
+	
+	<!-- 根据车牌查询在库唯一性 -->
+	<select id="findWhiteListOfMvLicense" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.mv_license,
+		t.user_number,
+		t.user_name,
+		t.spare1,
+		t.gender,
+		t.phone,
+		t.s_comment
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		and t.status in (1,3,5)
+		and t.mv_license = #{mv_license}
+	</select>
+	
+	
+	 <!-- 根据用户工号查询用户信息 主要确保车主的可拥有车位数和联系方式一致 -->
+	<select id="findWhiteListOfPhone" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.phone,
+		t.user_number,
+		t.spare1
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		and t.phone = #{phone}
+	</select>
+	
+	<select id="findWhiteListOfUserNumberAndPhone" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.phone,
+		t.user_number,
+		t.spare1
+		FROM white_list t
+		WHERE t.delete_flag = 0
+		and t.is_display = 1
+		
+		<if test="usernumber!=null and usernumber!=''">
+			and t.user_number = #{usernumber}
+		</if>
+		<if test="phone!=null and phone!=''">
+			and t.phone = #{phone}
+		</if>
+	</select>
+	
+    <!-- 根据车牌查询在temp_cost -->
+	<select id="findTempCostCountByMvlicense" parameterType="string" resultType="Integer">
+		SELECT count(1)
+		FROM temp_cost t
+		WHERE t.is_vaild = 1
+		and t.mv_license = #{mv_license}
+	</select>
+	
+	 <!-- 根据车主编号查询在temp_cost -->
+	<select id="findTempCostCountByUsernumber" parameterType="string" resultType="Integer">
+		SELECT count(1)
+		FROM temp_cost t
+		WHERE t.is_vaild = 1
+		and t.spare4 = #{usernumber}
+	</select>
+	
+	<!-- 根据车位编号更新可拥有车位数和剩余车位数 -->
+	<update id="updateSp1AndSp2ByUsernumber" parameterType="objectMap">
+		UPDATE
+		white_list
+		SET
+		spare1=#{sumparks} ,
+		spare2=#{remainparks}
+		WHERE user_number=#{usernumber}
+		      AND delete_flag = 0
+		     
+	</update>
+	
+	<!-- 根据车牌更新temp_cost中的计费状态和车位编号 -->
+	<update id="updateTempCostSp1AndSp4ByMvlicense" parameterType="objectMap">
+		UPDATE
+		temp_cost
+		SET
+		<if test="sp1!=null and sp1!=-1">
+			spare1=#{sp1},
+		</if>
+		<if test="sp1==null or sp1==-1">
+			spare1= null,
+		</if>
+		spare4=#{sp4}
+		WHERE mv_license=#{mvlicense}
+	</update>
+	
+	<!-- 根据车牌查询在temp_cost中的信息 -->
+	<select id="findTempCostBeanByMvlicense" parameterType="objectMap"
+		resultType="com.project.backCharge.tempCharge.model.TempCostBean">
+		SELECT
+		t.mv_license,
+		t.spare1,
+		t.spare4
+		FROM temp_cost t
+		WHERE t.mv_license = #{mvlicense}	
+	</select>
+	
+	<!-- 根据车牌查询在temp_cost中的信息 -->
+	<select id="findTempCostBeanListByUsernumber" parameterType="objectMap"
+		resultType="com.project.backCharge.tempCharge.model.TempCostBean">
+		SELECT
+		t.mv_license  as mvLicense,
+		t.entry_time as entryTime,
+		t.spare1,
+		t.spare4
+		FROM temp_cost t
+		WHERE t.spare4 = #{usernumber}	
+		order by entry_time asc
+	</select>
+	
+	<!-- 在temp_cost中更新该车牌对应的spare4的值（车位编号） -->
+	<update id="updateTempcostSp4ByMvlicense" parameterType="objectMap">
+		UPDATE
+		temp_cost
+		SET
+		spare4=#{usernumber}
+		WHERE mv_license=#{mvlicense}
+	</update>
+	
+	
+</mapper>

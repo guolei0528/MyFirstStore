@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.sys.ChargeRuleMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM charge_rules t
+		  where delete_flag=0
+		     <if test="query_charge_id!=null and query_charge_id!=''">
+		  	and charge_id like CONCAT('%',#{query_charge_id},'%')
+		  </if>
+		  <if test="query_begin_time!=null and query_begin_time!=''">
+		  	and valid_begin_time<![CDATA[>=]]>#{query_begin_time}
+		  </if>
+		  <if test="query_end_time!=null and query_end_time!=''">
+		  	and valid_end_time<![CDATA[<=]]>#{query_end_time}
+		  	</if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.admin.ChargeRuleMng.model.ChargeRuleBean">
+    	SELECT 
+			t.charge_id,
+			t.charge_type,
+			DATE_FORMAT(t.valid_begin_time,'%Y-%m-%d')valid_begin_time,
+			DATE_FORMAT(t.valid_end_time,'%Y-%m-%d')valid_end_time,
+				
+			CAST((t.money/100) AS decimal(10,2))money,
+			CAST((t.money_limit/100) AS decimal(10,2))money_limit,
+			t.period,
+				
+			t.free_time,
+			t.begin_time,
+			t.end_time,
+			t.last_modify_time,
+			t.spare1,
+			t.spare2,
+			t.spare3,
+			
+			t.spare4,
+			t.s_comment
+		  FROM charge_rules t
+		    where delete_flag=0
+		      <if test="query_charge_id!=null and query_charge_id!=''">
+		  	and charge_id like CONCAT('%',#{query_charge_id},'%')
+		  </if>
+		  <if test="query_begin_time!=null and query_begin_time!=''">
+		  	and valid_begin_time<![CDATA[>=]]>#{query_begin_time}
+		  </if>
+		  <if test="query_end_time!=null and query_end_time!=''">
+		  	and valid_end_time<![CDATA[<=]]>#{query_end_time}
+		  	</if>
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.admin.ChargeRuleMng.model.ChargeRuleBean">
+    	INSERT INTO charge_rules(
+				charge_id,
+				charge_type,
+				valid_begin_time,
+				valid_end_time,
+				begin_time,
+				end_time,
+			
+				money,
+				period,
+				money_limit,
+			
+				spare1,
+				spare2,
+				spare3,
+			
+				spare4,
+				s_comment,
+				free_time,
+			    last_modify_time,
+			    delete_flag,
+			    car_type
+				)
+		VALUES(
+				#{charge_id} ,
+				#{charge_type} ,
+				#{valid_begin_time} ,
+				#{valid_end_time} ,
+				#{begin_time} ,
+				#{end_time} ,
+			
+				#{money}*100 ,
+				#{period} ,
+				#{money_limit}*100 ,
+			
+				#{spare1} ,
+				#{spare2} ,
+				#{spare3} ,
+			
+				#{spare4} ,
+				#{s_comment},
+				#{free_time},
+			  	 now(),
+			   #{delete_flag},
+			   #{car_type}
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.admin.ChargeRuleMng.model.ChargeRuleBean">
+        SELECT 
+			t.charge_id,
+			t.charge_type,
+			DATE_FORMAT(t.valid_begin_time,'%Y-%m-%d')valid_begin_time,
+			DATE_FORMAT(t.valid_end_time,'%Y-%m-%d')valid_end_time,
+			t.begin_time,
+			t.end_time,
+			t.period,
+			t.car_type,
+			t.free_time,
+			CAST((t.money/100) AS decimal(10,2))money,
+			CAST((t.money_limit/100) AS decimal(10,2))money_limit,
+			DATE_FORMAT(t.last_modify_time,'%Y-%m-%d')last_modify_time,
+				
+			t.spare1,
+			t.spare2,
+			t.spare3,
+				
+			t.spare4,
+			t.s_comment
+		  FROM charge_rules t
+        WHERE t.charge_id=#{value}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.admin.ChargeRuleMng.model.ChargeRuleBean">
+		UPDATE charge_rules
+		SET 
+			charge_id=#{charge_id} ,
+			charge_type=#{charge_type} ,
+			valid_begin_time=#{valid_begin_time} ,
+			valid_end_time=#{valid_end_time} ,
+			begin_time=#{begin_time} ,
+			end_time=#{end_time} ,
+			
+			money=#{money}*100 ,
+			period=#{period} ,
+			money_limit=#{money_limit}*100 ,
+			
+			s_comment=#{s_comment},
+			car_type=#{car_type},
+			free_time=#{free_time},
+			last_modify_time=now()
+		WHERE charge_id=#{charge_id}
+    </update>
+	
+    <update id="delete" parameterType="String">
+    	update   charge_rules
+    	set delete_flag=1
+		 WHERE charge_id = #{value}
+    </update>
+</mapper>

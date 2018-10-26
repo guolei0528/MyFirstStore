@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.PaymentStatement">
+
+	<!-- 查询对账明细数量 -->
+	<select id="findCountDetailReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1)
+		FROM cur_exit t
+		WHERE t.recordtype = 3
+		AND t.paymethod in
+		(0,2,3,4,5,9)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and t.exitdate <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and t.exitdate <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_exit_start_date!=null and query_exit_start_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_exit_start_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_exit_end_date!=null and query_exit_end_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[<]]>
+			DATE_FORMAT(#{query_exit_end_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_exit_lane!=null and query_exit_lane!=''">
+			and t.exitlane = #{query_exit_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_exitoperator!=null and query_exitoperator!=''">
+			and t.exitoperator = #{query_exitoperator}
+		</if>
+		<if test="dis_free!=null and dis_free == '2'.toString()">
+			and t.totaltoll <![CDATA[<>]]> 0
+		</if>
+		<if test="dis_free!=null and dis_free == '3'.toString()">
+			and t.totaltoll = 0
+		</if>
+		<if test="dis_free!=null and dis_free == '4'.toString()">
+			and t.entrytime <![CDATA[>]]> '2000-01-01'
+		</if>
+		<if test="dis_free!=null and dis_free == '5'.toString()">
+			and t.entrytime <![CDATA[<]]> '2000-01-01'
+		</if>
+		order by t.exittime desc
+		
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+
+
+	<!-- 查询对账明细数据 -->
+	<select id="findDetailReport" parameterType="objectMap"
+		resultType="objectMap">
+		SELECT
+		t.exitdate,
+<!-- 		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s') entrytime, -->
+<!-- 		DATE_FORMAT(t.exittime,'%Y-%m-%d %H:%i:%s') exittime, -->
+        t.entrytime,
+        t.exittime,
+		l.park_id,l.area_id,p.park_name,a.area_name,t.exitlane,ll.lane_name entry_lane,l.lane_name exit_lane,
+		t.cardid,t.cardnetwork,t.mvlicense,
+		t.vehicleclass,t.paymethod,t.totaltoll,t.pdiscounttoll,
+   		(select count(1) from white_list wl where wl.mv_license = t.mvlicense 
+   		and wl.valid_start_time <![CDATA[<=]]> exittime
+		and wl.valid_end_time <![CDATA[>=]]> exittime
+		and wl.status in (3,5,7) and wl.delete_flag = 0) white_count,
+   		(select name from user u where u.user_operator = t.exitoperator) operator_name
+		FROM cur_exit t
+		LEFT JOIN
+		lane_info l
+		on l.lane_id = t.exitlane AND l.delete_flag = 0
+		LEFT JOIN park_info p on p.park_id = l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN area_info a on a.area_id = l.area_id AND a.park_id = l.park_id
+		AND a.delete_flag = 0
+		LEFT JOIN
+		lane_info ll
+		on ll.lane_id = t.entrylane AND ll.delete_flag = 0
+		WHERE
+		t.recordtype = 3
+		AND t.paymethod in (0,2,3,4,5,9)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and t.exitdate <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and t.exitdate <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_exit_start_date!=null and query_exit_start_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_exit_start_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_exit_end_date!=null and query_exit_end_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[<]]>
+			DATE_FORMAT(#{query_exit_end_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_exit_lane!=null and query_exit_lane!=''">
+			and t.exitlane = #{query_exit_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_exitoperator!=null and query_exitoperator!=''">
+			and t.exitoperator = #{query_exitoperator}
+		</if>
+		<if test="dis_free!=null and dis_free == '2'.toString()">
+			and t.totaltoll <![CDATA[<>]]> 0
+		</if>
+		<if test="dis_free!=null and dis_free == '3'.toString()">
+			and t.totaltoll = 0
+		</if>
+		<if test="dis_free!=null and dis_free == '4'.toString()">
+			and t.entrytime <![CDATA[>]]> '2000-01-01'
+		</if>
+		<if test="dis_free!=null and dis_free == '5'.toString()">
+			and t.entrytime <![CDATA[<]]> '2000-01-01'
+		</if>
+		order by t.exittime desc
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+	
+<!-- 	查询总计金额 -->
+	<select id="totalDetailList" parameterType="objectMap"
+		resultType="Integer">
+		SELECT ifnull(sum(t.totaltoll),0)
+		FROM cur_exit t
+		WHERE t.recordtype = 3
+		AND t.paymethod in
+		(0,2,3,4,5,9)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and t.exitdate <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and t.exitdate <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+				<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_exit_start_date!=null and query_exit_start_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_exit_start_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_exit_end_date!=null and query_exit_end_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[<]]>
+			DATE_FORMAT(#{query_exit_end_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_exit_lane!=null and query_exit_lane!=''">
+			and t.exitlane = #{query_exit_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_exitoperator!=null and query_exitoperator!=''">
+			and t.exitoperator = #{query_exitoperator}
+		</if>
+		<if test="dis_free!=null and dis_free == '2'.toString()">
+			and t.totaltoll <![CDATA[<>]]> 0
+		</if>
+		<if test="dis_free!=null and dis_free == '3'.toString()">
+			and t.totaltoll = 0
+		</if>
+		<if test="dis_free!=null and dis_free == '4'.toString()">
+			and t.entrytime <![CDATA[>]]> '2000-01-01'
+		</if>
+		<if test="dis_free!=null and dis_free == '5'.toString()">
+			and t.entrytime <![CDATA[<]]> '2000-01-01'
+		</if>
+		order by t.exittime desc
+		
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+
+
+
+<!-- 	查询总计金额 -->
+	<select id="pdisTollDetailList" parameterType="objectMap"
+		resultType="Integer">
+		SELECT ifnull(sum(t.pdiscounttoll),0)
+		FROM cur_exit t
+		WHERE t.recordtype = 3
+		AND t.paymethod in
+		(0,2,3,4,5,9)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and t.exitdate <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and t.exitdate <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_exit_start_date!=null and query_exit_start_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_exit_start_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_exit_end_date!=null and query_exit_end_date!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d %H:%i:%s") <![CDATA[<]]>
+			DATE_FORMAT(#{query_exit_end_date},"%Y-%m-%d %H:%i:%s")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_exit_lane!=null and query_exit_lane!=''">
+			and t.exitlane = #{query_exit_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_exitoperator!=null and query_exitoperator!=''">
+			and t.exitoperator = #{query_exitoperator}
+		</if>
+		<if test="dis_free!=null and dis_free == '2'.toString()">
+			and t.totaltoll <![CDATA[<>]]> 0
+		</if>
+		<if test="dis_free!=null and dis_free == '3'.toString()">
+			and t.totaltoll = 0
+		</if>
+		<if test="dis_free!=null and dis_free == '4'.toString()">
+			and t.entrytime <![CDATA[>]]> '2000-01-01'
+		</if>
+		<if test="dis_free!=null and dis_free == '5'.toString()">
+			and t.entrytime <![CDATA[<]]> '2000-01-01'
+		</if>
+		order by t.exittime desc
+		
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+	<!-- 查询对账明细数量 -->
+	<select id="findCountSummaryReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1) FROM(
+		SELECT 1
+		FROM cur_exit t
+		LEFT JOIN lane_info l
+		on
+		l.lane_id = t.exitlane AND l.delete_flag = 0
+		WHERE t.recordtype = 3
+		AND t.paymethod in(2,3,4)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and DATE_FORMAT(t.exitdate,'%Y%m%d') <![CDATA[>=]]>
+			DATE_FORMAT(#{query_start_date},'%Y%m%d')  
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and DATE_FORMAT(t.exitdate,"%Y%m%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_end_date},'%Y%m%d')
+		</if>
+		GROUP BY
+		exitdate,l.park_id) as tmp
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+
+
+	<!-- 查询对账明细数量 -->
+	<select id="findSummaryReportDimension" parameterType="objectMap"
+		resultType="objectMap">
+		SELECT t.exitdate,l.park_id,p.park_name
+		FROM cur_exit t
+		LEFT JOIN lane_info l
+		on
+		l.lane_id = t.exitlane AND l.delete_flag = 0
+		LEFT JOIN park_info p
+		on p.delete_flag = 0 and p.park_id = l.park_id
+		WHERE t.recordtype = 3
+		AND t.paymethod in(2,3,4)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and DATE_FORMAT(t.exitdate,'%Y%m%d') <![CDATA[>=]]>
+			DATE_FORMAT(#{query_start_date},'%Y%m%d')  
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and DATE_FORMAT(t.exitdate,"%Y%m%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_end_date},'%Y%m%d')
+		</if>
+		GROUP BY
+		exitdate,l.park_id
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+
+
+	<!-- 查询对账明细数量 -->
+	<select id="findSummaryReport" parameterType="objectMap"
+		resultType="objectMap">
+		SELECT t.exitdate,l.park_id,t.paymethod,t.ecardtype,sum(1) amount,sum(t.totaltoll) totalToll
+		FROM cur_exit t
+		LEFT JOIN lane_info l on l.lane_id = t.exitlane AND l.delete_flag = 0
+		WHERE t.recordtype = 3 
+		AND t.paymethod in(2,3,4)
+		<if test="query_start_date!=null and query_start_date!=''">
+			and DATE_FORMAT(t.exitdate,'%Y%m%d') <![CDATA[>=]]>
+			DATE_FORMAT(#{query_start_date},'%Y%m%d')  
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and DATE_FORMAT(t.exitdate,"%Y%m%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_end_date},'%Y%m%d')
+		</if>
+		GROUP BY exitdate,paymethod,ecardtype,l.park_id
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+	
+	    <!-- 查询数据列表 -->
+    <select id="queryLaneList" resultType="objectMap">
+    	SELECT 
+			lane_id,
+			lane_name
+		  FROM lane_info
+		 WHERE delete_flag=0
+		 and lane_flag=2
+    </select>
+</mapper>

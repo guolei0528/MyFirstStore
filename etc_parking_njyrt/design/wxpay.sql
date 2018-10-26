@@ -1,0 +1,25 @@
+SET SESSION FOREIGN_KEY_CHECKS=0;
+
+/* Drop Tables */
+
+DROP TABLE IF EXISTS T_ORDER_WXPAY;
+
+
+
+
+/* Create Tables */
+
+CREATE TABLE T_ORDER_WXPAY
+(
+	ID int NOT NULL AUTO_INCREMENT,
+	ORDER_NO varchar(32) NOT NULL,
+	RETURN_CODE varchar(16) NOT NULL,
+	RETURN_MSG varchar(128) NOT NULL,
+	RESULT_CODE varchar(32),
+	XML_INFO varchar(2048),
+	RETURN_TIME datetime,
+	PRIMARY KEY (ID)
+);
+
+
+

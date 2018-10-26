@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.member.CarInfoMng">
+	<resultMap id="carInfoResultMap" type="carInfoBean">
+    <id column="mv_license" jdbcType="VARCHAR" property="mvLicense" />
+    <id column="car_color" jdbcType="VARCHAR" property="carColor" />
+    <id column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    <id column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="obu_id" jdbcType="VARCHAR" property="obuId" />
+    <result column="member_id" jdbcType="VARCHAR" property="memberId" />
+    <result column="name" jdbcType="VARCHAR" property="memberName" />
+    <result column="license" jdbcType="VARCHAR" property="license" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="s_comment" jdbcType="VARCHAR" property="sComment" />
+    <result column="spare1" jdbcType="INTEGER" property="spare1" />
+    <result column="spare2" jdbcType="INTEGER" property="spare2" />
+    <result column="spare3" jdbcType="VARCHAR" property="spare3" />
+    <result column="spare4" jdbcType="VARCHAR" property="spare4" />
+	</resultMap>
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM car_info t
+		 WHERE 1=1 
+		 <if test="query_mv_license!=null and query_mv_license!=''">
+				AND t.mv_license like CONCAT('%', #{query_mv_license}, '%')
+		</if>
+		 <if test="query_obu_id!=null and query_obu_id!=''">
+				AND t.obu_id like CONCAT('%', #{query_obu_id}, '%')
+		</if>
+		 <if test="query_member_id!=null and query_member_id!=''">
+				AND t.member_id like CONCAT('%', #{query_member_id}, '%')
+		</if>
+		 <if test="query_car_color!=null and query_car_color!=''">
+				AND t.car_color like CONCAT('%', #{query_car_color}, '%')
+		</if>
+		<if test="query_type!=null and query_type!=''">
+				AND t.type like CONCAT('%', #{query_type}, '%')
+		</if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultMap="carInfoResultMap">
+    	SELECT 
+    	    t.mv_license,
+			t.obu_id,
+			t.member_id,
+			r.name,
+			t.car_color,
+			t.type,
+			t.license,
+			t.s_comment
+		  FROM car_info t
+		  left join member r on r.member_id = t.member_id 
+		 WHERE 1=1 
+		 <if test="query_mv_license!=null and query_mv_license!=''">
+				AND t.mv_license like CONCAT('%', #{query_mv_license}, '%')
+		</if>
+		 <if test="query_obu_id!=null and query_obu_id!=''">
+				AND t.obu_id like CONCAT('%', #{query_obu_id}, '%')
+		</if>
+		 <if test="query_member_id!=null and query_member_id!=''">
+				AND t.member_id like CONCAT('%', #{query_member_id}, '%')
+		</if>
+		 <if test="query_car_color!=null and query_car_color!=''">
+				AND t.car_color like CONCAT('%', #{query_car_color}, '%')
+		</if>
+		<if test="query_type!=null and query_type!=''">
+				AND t.type like CONCAT('%', #{query_type}, '%')
+		</if>
+		ORDER BY t.last_modify_time asc
+    </select>
+    
+    
+    <!-- 查询数据列表 -->
+    <select id="findCarInfo" parameterType="String" resultMap="carInfoResultMap">
+    	SELECT 
+    	    t.mv_license,
+			t.obu_id,
+			t.car_color
+		  FROM car_info t
+		 WHERE t.member_id = #{_parameter}
+		ORDER BY t.last_modify_time asc
+    </select>
+    
+    
+<!--     校验车辆牌照是否存在 -->
+    <select id="checkUniqueMvlicense" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM car_info t
+		 WHERE  t.mv_license = #{mv_license} and t.car_color = #{car_color}
+    </select>
+    
+<!--     校验车辆obu编号是否存在 -->
+    <select id="checkUniqueObuId" parameterType="com.project.backMng.admin.member.model.CarInfoBean" resultType="Integer">
+    	SELECT count(1)
+		  FROM car_info t
+		 WHERE  t.obu_id  = #{obuId} and (t.mv_license != #{mvLicense} or t.car_color != #{carColor})
+    </select>
+	
+    <insert id="insertCarInfo" parameterType="objectMap">
+    	INSERT INTO car_info(
+				mv_license,
+				obu_id,
+				member_id,
+				car_color,
+				license,
+				type,
+				s_comment,
+				last_modify_time
+				)
+		VALUES(
+				#{mv_license} ,
+				#{obu_id} ,
+				#{member_id} ,
+				#{car_color} ,
+				#{license} ,
+				#{type} ,
+				#{s_comment} ,
+				now() 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultMap="carInfoResultMap">
+        SELECT 
+            t.mv_license,
+            t.obu_id,
+			t.member_id,
+			r.name,
+			t.car_color,
+			t.license,
+			t.type,
+			t.s_comment
+		  FROM car_info t 
+           left join member r on r.member_id = t.member_id
+        WHERE t.mv_license=#{mv_license} and t.car_color=#{car_color}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.admin.member.model.CarInfoBean">
+		UPDATE car_info
+		SET 
+			obu_id=#{obuId} ,
+			member_id=#{memberId} ,
+			car_color=#{carColor},
+			license=#{license},
+			type=#{type},
+			s_comment = #{sComment}
+		WHERE mv_license=#{mvLicense} and car_color=#{carColor}
+    </update>
+	
+    
+<!--     删除会员信息 -->
+    <update id="deleteCar" parameterType="objectMap">
+		 delete from car_info where mv_license = #{mv_license} and car_color=#{car_color}
+    </update>
+    
+    <insert id="insertMember" parameterType="objectMap">
+    	INSERT INTO member(member_id, name, sex, birthday, phone, location,delete_flag,last_modify_time)
+		VALUES (#{member_id}, #{name}, #{sex}, #{birthday}, #{phone}, #{location},#{delete_flag},#{last_modify_time})
+    </insert>
+    
+</mapper>

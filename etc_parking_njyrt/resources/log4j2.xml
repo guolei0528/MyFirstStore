@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+
+  <properties>
+    <property name="logPath"></property>
+  </properties>
+  
+  <Appenders>
+     <Console name="Console" target="SYSTEM_OUT">
+		<!--这个都知道是输出日志的格式 -->
+		<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c{10}:%L - %msg%n" />
+	</Console>
+		
+    <RollingFile name="RollingFile" filename="etc_logs/project.log"
+      filepattern="%d{yyyyMMddHHmmss}-project.log">
+  		<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c{10}:%L - %msg%n" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="10 MB"/>
+      </Policies>	
+       <DefaultRolloverStrategy max="50"/>
+    </RollingFile>
+    
+  </Appenders>
+  <Loggers>
+  
+  	<logger name="sys" level="DEBUG" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+  
+  	<logger name="backMng" level="DEBUG" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+    
+  	<logger name="wx" level="DEBUG" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+    
+   <logger name="communication" level="DEBUG" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger>
+    
+    <logger name="backCharge" level="DEBUG" additivity="false">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </logger> 
+    
+    
+    <Root level="INFO">
+      <AppenderRef ref="Console" />
+      <AppenderRef ref="RollingFile" />
+    </Root>
+    
+<!--           <Root level="NO_LOG">  
+      <AppenderRef ref="Console" />
+      <AppenderRef ref="RollingFile" />
+    </Root>-->
+    
+<!--       <Root level="personalCenter"> 
+      <AppenderRef ref="Console" />
+      <AppenderRef ref="RollingFile" />
+    </Root>-->
+    
+    
+    
+    
+  </Loggers>
+</Configuration>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.finance.PaymentMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM payment t
+		WHERE 1=1
+		<if test="query_operator_id!=null and query_operator_id!=''">
+			and t.operator_id like CONCAT('%',#{query_operator_id},'%')
+		</if>
+		<if test="income_time_from!=null and income_time_from!=''">
+			and t.begin_time<![CDATA[>=]]>#{income_time_from}
+		</if>
+		<if test="income_time_to!=null and income_time_to!=''">
+			and t.begin_time<![CDATA[<=]]>#{income_time_to}
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.finance.PaymentMng.model.PaymentBean">
+		SELECT
+		DATE_FORMAT(t.begin_time,'%Y-%m-%d %H:%i:%s')begin_time,
+		t.date,
+		t.login_name,
+		t.operator_id,
+
+		t.park_id,
+		t.area_id,
+		t.lane_id,
+		t.exit_shift,
+		CAST((t.real_bill/100) AS decimal(20,2))real_bill,
+		CAST((t.pay_bill/100) AS decimal(20,2))pay_bill,
+		CAST((t.long_bill/100) AS decimal(20,2))long_bill,
+		t.invoice_count,
+
+		t.spare1,
+		t.spare2,
+		t.spare3,
+		t.spare4,
+
+		t.s_comment
+		FROM payment t
+		WHERE 1=1
+		<if test="query_operator_id!=null and query_operator_id!=''">
+			and t.operator_id like CONCAT('%',#{query_operator_id},'%')
+		</if>
+		<if test="income_time_from!=null and income_time_from!=''">
+			and t.begin_time<![CDATA[>=]]>#{income_time_from}
+		</if>
+		<if test="income_time_to!=null and income_time_to!=''">
+			and t.begin_time<![CDATA[<=]]>#{income_time_to}
+		</if>
+		ORDER BY t.begin_time desc
+	</select>
+
+
+	<insert id="insert"
+		parameterType="com.project.backMng.platuser.finance.PaymentMng.model.PaymentBean">
+		INSERT INTO payment(
+		begin_time,
+		date,
+		login_name,
+		operator_id,
+
+		park_id,
+		area_id,
+		lane_id,
+		exit_shift,
+
+		real_bill,
+		pay_bill,
+		long_bill,
+		invoice_count,
+		
+		car_flow_statistic_total,
+		car_flow_real_total,
+		car_flow_statistic_cash,
+		car_flow_real_cash,
+		statistic_cash,
+		real_cash,
+
+		spare1,
+		spare2,
+		spare3,
+		spare4,
+
+		s_comment
+		)
+		VALUES(
+		now(),
+		#{date} ,
+		#{login_name} ,
+		#{operator_id} ,
+
+		#{park_id} ,
+		#{area_id} ,
+		#{lane_id} ,
+		#{exit_shift} ,
+
+		#{real_bill}*100 ,
+		#{pay_bill}*100 ,
+		#{long_bill}*100 ,
+		#{invoice_count} ,
+		
+		#{car_flow_statistic_total} ,
+		#{car_flow_real_total} ,
+		#{car_flow_statistic_cash} ,
+		#{car_flow_real_cash} ,
+		#{statistic_cash}*100 ,
+		#{real_cash}*100 ,
+
+		#{spare1} ,
+		#{spare2} ,
+		#{spare3} ,
+		#{spare4} ,
+
+		#{s_comment}
+		)
+	</insert>
+
+	<select id="findInfo" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.finance.PaymentMng.model.PaymentBean">
+		SELECT
+		DATE_FORMAT(t.begin_time,'%Y-%m-%d %H:%i:%s')begin_time,
+		t.date,
+		t.login_name,
+		t.operator_id,
+
+		t.park_id,
+		t.area_id,
+		t.lane_id,
+		t.exit_shift,
+		t.car_flow_statistic_total,
+		t.car_flow_real_total,
+		t.car_flow_statistic_cash,
+		t.car_flow_real_cash,
+		
+		CAST((t.statistic_cash/100) AS decimal(20,2))statistic_cash,
+		CAST((t.real_cash/100) AS decimal(20,2))real_cash,
+
+		CAST((t.real_bill/100) AS decimal(20,2))real_bill,
+		CAST((t.pay_bill/100) AS decimal(20,2))pay_bill,
+		CAST((t.long_bill/100) AS decimal(20,2))long_bill,
+		t.invoice_count,
+
+		t.spare1,
+		t.spare2,
+		t.spare3,
+		t.spare4,
+
+		t.s_comment
+		FROM payment t
+		WHERE date=#{date}
+		and t.operator_id=#{operator_id}
+
+	</select>
+
+	<select id="findSamePayment" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)from payment t
+		where t.operator_id=#{operator_id}
+		and t.date=#{date}
+
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update"
+		parameterType="com.project.backMng.platuser.finance.PaymentMng.model.PaymentBean">
+		UPDATE payment
+		SET
+		begin_time=#{begin_time} ,
+		date=#{date} ,
+		login_name=#{login_name} ,
+		operator_id=#{operator_id} ,
+
+		park_id=#{park_id} ,
+		area_id=#{area_id} ,
+		lane_id=#{lane_id} ,
+		exit_shift=#{exit_shift} ,
+
+		real_bill=#{real_bill} ,
+		pay_bill=#{pay_bill} ,
+		long_bill=#{long_bill} ,
+		invoice_count=#{invoice_count} ,
+		s_comment=#{s_comment}
+		WHERE DATE_FORMAT(t.begin_time,'%Y-%m-%d %H:%i:%s')=#{begin_time}
+		and t.operator_id=#{operator_id}
+	</update>
+
+	<update id="delete" parameterType="String">
+		UPDATE payment
+		SET DELETE_FLAG = 1
+		WHERE ID = #{value}
+	</update>
+
+	<select id="findUserByDate" parameterType="objectMap"
+		resultType="objectMap">
+		select
+		c.exitoperator,c.exitshift,c.exitlane
+		from
+		cur_exit c
+		where c.exitdate = #{date}
+		group by c.exitoperator,c.exitshift,c.exitlane
+	</select>
+	
+	<!-- 查询该班次所有流量和金额 -->
+	<select id="findAllFlowAndBill" parameterType="objectMap"
+		resultType="objectMap">
+		select count(1) as car_flow_statistic_total,FORMAT(IFNULL(SUM(totaltoll),0),0) as
+		real_bill
+		from cur_exit
+		where recordtype = 3
+		AND exitoperator = #{user_operator}
+		AND exitshift = #{exit_shift}
+		AND exitlane = #{lane_id}
+		AND exitdate = #{date}
+	</select>
+
+	<!-- 查询该班次所有现金流量和金额 -->
+	<select id="findCashFlowAndBill" parameterType="objectMap"
+		resultType="objectMap">
+		select count(1) as car_flow_statistic_cash,FORMAT(IFNULL(SUM(totaltoll),0),0) as
+		statistic_cash
+		from cur_exit
+		where recordtype = 3
+		AND paymethod = 0
+		AND exitoperator = #{user_operator}
+		AND exitshift = #{exit_shift}
+		AND exitlane = #{lane_id}
+		AND exitdate = #{date}
+	</select>
+
+	<!-- 查询该班次下班时统计的流量和金额 -->
+	<select id="findRealFlowAndBill" parameterType="objectMap"
+		resultType="objectMap">
+		select FORMAT(IFNULL(cardnetwork,0),0) as car_flow_real_total,
+		FORMAT((IFNULL(cardnetwork,0)-IFNULL(cardid,0)),0) as
+		car_flow_real_cash, FORMAT(IFNULL(totaltoll,0),0) as pay_bill,
+		FORMAT((IFNULL(totaltoll,0)-IFNULL(pdiscounttoll,0)),0) as real_cash,
+		p.park_id,a.area_id,p.park_name,a.area_name
+		FROM cur_exit t
+		left join lane_info lane on lane.lane_id = t.exitlane
+		left join park_info p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id = a.area_id
+		where recordtype = 128
+		AND exitoperator = #{user_operator}
+		AND exitshift = #{exit_shift}
+		AND exitlane = #{lane_id}
+		AND exitdate = #{date}
+	</select>
+
+	<select id="findUser" parameterType="objectMap" resultType="objectMap">
+		select
+		c.parkid,c.areaid,c.entrylane from
+		cur_exit c where c.exitoperator=#{user_operator} and to_days(c.exittime)
+		=to_days(#{date})
+		limit 0,1
+	</select>
+	<select id="findAmount" parameterType="objectMap" resultType="String">
+		select sum(totaltoll/100) from cur_exit c
+		where c.exitoperator=#{user_operator} and to_days(c.exittime)
+		=to_days(#{date})
+
+	</select>
+	<select id="findUserOperator" resultType="objectMap"
+		parameterType="String">
+
+		select user_operator,login_name,name from user where user_id=#{value}
+	</select>
+</mapper>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.IncomeReport">
+	<resultMap id="incomeReportTempResultMap" type="incomeReportTempBean">
+		<id column="date" property="date" jdbcType="INTEGER" />
+		<id column="lane_id" property="laneId" jdbcType="INTEGER" />
+		<result column="park_id" property="parkId" jdbcType="VARCHAR" />
+		<result column="area_id" property="areaId" jdbcType="VARCHAR" />
+<!-- 		<result column="park_name" property="parkName" jdbcType="VARCHAR" /> -->
+<!-- 		<result column="area_name" property="areaName" jdbcType="VARCHAR" /> -->
+		<result column="vehicleclass" property="vehicleclass" jdbcType="INTEGER" />
+		<result column="paymethod" property="paymethod" jdbcType="INTEGER" />
+		<result column="cardnetwork" property="cardnetwork" jdbcType="INTEGER" />
+		<result column="ecardtype" property="ecardtype" jdbcType="INTEGER" />
+		<result column="sum_income" property="sumIncome" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<!-- 查询车道收入数量 -->
+	<select id="findCountIncomeReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1) FROM (
+		SELECT 1
+		FROM cur_exit t
+		WHERE t.recordtype = 3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.exittime,"%Y-%m-%d"),t.exitlane
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.exitdate,t.exitlane
+		</if>
+		) as tmp
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findListIncomeReport" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.IncomeReportBean">
+		SELECT 
+		<if test="date_type!=null and date_type==1">
+			DATE_FORMAT(t.exittime,"%Y%m%d") date,
+		</if>
+		<if test="date_type!=null and date_type==2">
+			t.exitdate date,
+		</if>
+		t.exitlane laneId,
+		l.lane_name laneName,
+		p.park_name parkName,a.area_name areaName
+		FROM cur_exit t
+		LEFT JOIN lane_info l
+		on l.lane_id = t.exitlane AND l.delete_flag = 0
+		LEFT JOIN park_info p on p.park_id = l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN area_info a on a.area_id = l.area_id AND a.park_id = l.park_id
+		AND a.delete_flag = 0
+		WHERE t.recordtype=3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.exittime,"%Y-%m-%d"),t.exitlane
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.exitdate,t.exitlane
+		</if>
+	</select>
+	
+		<!-- 查询出口流量数据列表 -->
+	<select id="findListIncomeReportDetail" parameterType="objectMap"
+		resultMap="incomeReportTempResultMap">
+		SELECT 
+		<if test="date_type!=null and date_type==1">
+			DATE_FORMAT(t.exittime,"%Y%m%d") date,
+		</if>
+		<if test="date_type!=null and date_type==2">
+			t.exitdate date,
+		</if>
+		t.exitlane lane_id,
+		t.vehicleclass,t.paymethod,
+		t.ecardtype as ecardtype,sum(t.totaltoll) sum_income
+		FROM cur_exit t
+		WHERE t.recordtype=3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.exittime,"%Y-%m-%d"),t.exitlane,t.vehicleclass,
+		t.paymethod,t.ecardtype
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.exitdate,t.exitlane,t.vehicleclass,
+		t.paymethod,t.ecardtype
+		</if>
+	</select>
+
+	<!-- 更新流量的信息 -->
+	<update id="updateIncomeReport" parameterType="com.project.backMng.admin.report.model.IncomeReportBean">
+		UPDATE income_report
+		SET
+		car_store_value=#{carStoreValue} ,
+		car_account=#{carAccount} ,
+		car_mobile=#{carMobile},
+		car_cash=#{carCash},
+		cart_store_value=#{cartStoreValue},
+		cart_account = #{cartAccount},
+		cart_cash=#{cartCash}
+		WHERE date=#{date}
+		AND lane_id=#{laneId}
+	</update>
+
+<!-- 新增流量的信息 -->
+    <insert id="insertIncomeReport" parameterType="com.project.backMng.admin.report.model.IncomeReportBean">
+    	INSERT INTO income_report(
+				date,
+				lane_id,
+				lane_flag,
+				car_store_value,
+				car_account,
+				car_mobile,
+				car_cash,
+				cart_store_value,
+				cart_account,
+				cart_mobile,
+				cart_cash
+				)
+		VALUES(
+				#{date} ,
+				#{laneId} ,
+				2,
+				#{carStoreValue} ,
+				#{carAccount} ,
+				#{carMobile} ,
+				#{carCash} ,
+				#{cartStoreValue} ,
+				#{cartAccount} ,
+				#{cartMobile} , 
+				#{cartCash}
+		)
+    </insert>
+    
+    
+    
+<!--     删除流量信息 -->
+    <delete id="deleteIncomeReport" parameterType="objectMap">
+		 delete from income_report
+    </delete>
+
+</mapper>

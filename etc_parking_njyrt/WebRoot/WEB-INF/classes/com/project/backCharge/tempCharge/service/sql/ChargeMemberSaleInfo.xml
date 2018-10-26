@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backCharge.tempCharge.chargeMemberSaleInfo">
+  <resultMap id="memberSaleInfoResultMap" type="meberSaleInfoBean">
+    <id column="member_id" property="memberId" jdbcType="VARCHAR" />
+    <id column="member_type" property="memberType" jdbcType="VARCHAR" />
+    <id column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <id column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <id column="park_id" property="parkId" jdbcType="VARCHAR" />
+    <id column="area_id" property="areaId" jdbcType="VARCHAR" />
+    <result column="issue_time" property="issueTime" jdbcType="TIMESTAMP" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="valid" property="valid" jdbcType="INTEGER" />
+    <result column="cancel_time" property="cancelTime" jdbcType="TIMESTAMP" />
+    <result column="count" property="count" jdbcType="INTEGER" />
+    <result column="money" property="money" jdbcType="INTEGER" />
+    <result column="total_minute" property="totalMinute" jdbcType="INTEGER" />
+    <result column="total_count" property="totalCount" jdbcType="INTEGER" />
+    <result column="lane_id" property="laneId" jdbcType="VARCHAR" />
+    <result column="spare1" property="spare1" jdbcType="INTEGER" />
+    <result column="spare2" property="spare2" jdbcType="INTEGER" />
+    <result column="spare3" property="spare3" jdbcType="VARCHAR" />
+    <result column="spare4" property="spare4" jdbcType="VARCHAR" />
+    <result column="s_comment" property="sComment" jdbcType="VARCHAR" />
+    <result column="mv_license" property="mvLicense" jdbcType="VARCHAR" />
+    <result column="car_color" property="carColor" jdbcType="VARCHAR" />
+   </resultMap>
+    
+    <!-- 查询所有会员售卖表 -->
+    <select id="findMemberSaleInfoTypeListByNow" parameterType="objectMap" resultMap="memberSaleInfoResultMap">
+    	SELECT 
+    	    t.member_id,
+			t.member_type,
+			c.mv_license,
+			c.car_color,
+			t.begin_time,
+			t.end_time,
+			t.count,
+			t.money,
+			t.total_minute,
+			t.total_count
+		  FROM member_sale_info t,car_info c
+		  where t.member_id = c.member_id
+		  and t.begin_time &lt; now()
+		  and t.end_time &gt; now()
+		  and valid = 0
+		  and delete_flag = 0
+    </select>
+    
+    <insert id="insert" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	INSERT INTO t_plat_user(
+				ID,
+				NAME,
+				SEX,
+				WORK_NO,
+			
+				MOBILE,
+				REMARK,
+				CREATE_TIME,
+				LAST_MODIFY_TIME,
+			
+				IN_USE_FLAG,
+				DELETE_FLAG
+				)
+		VALUES(
+				#{ID} ,
+				#{NAME} ,
+				#{SEX} ,
+				#{WORK_NO} ,
+			
+				#{MOBILE} ,
+				#{REMARK} ,
+				now() ,
+				now() ,
+			
+				#{IN_USE_FLAG} ,
+				#{DELETE_FLAG} 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultMap="memberSaleInfoResultMap">
+        SELECT 
+            t.member_id,
+            t.name,
+			t.sex,
+			DATE_FORMAT(t.birthday,'%Y-%m-%d') birthday,
+			t.phone,
+			t.location,
+			DATE_FORMAT(t.last_modify_time,'%Y-%m-%d %H:%i:%s') last_modify_time
+		  FROM member t
+        WHERE t.member_id=#{member_id} and t.delete_flag=0
+    </select>
+    
+    
+    
+</mapper>

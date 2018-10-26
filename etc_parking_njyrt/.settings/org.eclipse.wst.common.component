@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="etc_parking">
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
+        <wb-resource deploy-path="/" source-path="/WebContent"/>
+        <property name="java-output-path" value="/etc_parking/WebRoot/WEB-INF/classes"/>
+        <property name="context-root" value="etc_parking"/>
+    </wb-module>
+</project-modules>

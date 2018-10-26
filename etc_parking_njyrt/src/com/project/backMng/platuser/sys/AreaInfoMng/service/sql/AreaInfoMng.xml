@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.sys.AreaInfoMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM area_info t
+		WHERE delete_flag=0
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="QUERY_AREA_ID!=null and QUERY_AREA_ID!=''">
+			and t.area_id like CONCAT('%',#{QUERY_AREA_ID},'%')
+		</if>
+		<if test="QUERY_AREA_NAME!=null and QUERY_AREA_NAME!=''">
+			and t.area_name like CONCAT('%',#{QUERY_AREA_NAME},'%')
+		</if>
+		<if test="QUERY_SERVER_IP!=null and QUERY_SERVER_IP!=''">
+			and t.server_ip like CONCAT('%',#{QUERY_SERVER_IP},'%')
+		</if>
+		<if test="QUERY_DB_NAME!=null and QUERY_DB_NAME!=''">
+			and t.db_name like CONCAT('%',#{QUERY_DB_NAME},'%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		SELECT
+		t.area_id,
+		t.park_id,
+		t.area_name,
+		t.space_number,
+		t.pay_free_time,
+		t.picture_type,
+		t.picture_addr,
+		t.server_ip,
+		t.db_name,
+
+		t.db_password,
+		t.day_number,
+		t.log_address,
+		t.spare1,
+
+		t.spare2,
+		t.spare3,
+		t.spare4,
+		t.s_comment
+
+		FROM area_info t
+		WHERE delete_flag=0
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="QUERY_AREA_ID!=null and QUERY_AREA_ID!=''">
+			and t.area_id like CONCAT('%',#{QUERY_AREA_ID},'%')
+		</if>
+		<if test="QUERY_AREA_NAME!=null and QUERY_AREA_NAME!=''">
+			and t.area_name like CONCAT('%',#{QUERY_AREA_NAME},'%')
+		</if>
+		<if test="QUERY_SERVER_IP!=null and QUERY_SERVER_IP!=''">
+			and t.server_ip like CONCAT('%',#{QUERY_SERVER_IP},'%')
+		</if>
+		<if test="QUERY_DB_NAME!=null and QUERY_DB_NAME!=''">
+			and t.db_name like CONCAT('%',#{QUERY_DB_NAME},'%')
+		</if>
+	</select>
+
+
+	<insert id="insert"
+		parameterType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		INSERT INTO area_info(
+		area_id,
+		park_id,
+		area_name,
+		space_number,
+        pay_free_time,
+<!-- 		picture_type, -->
+<!-- 		picture_addr, -->
+<!-- 		server_ip, -->
+<!-- 		db_name, -->
+
+<!-- 		db_password, -->
+<!-- 		day_number, -->
+<!-- 		log_address, -->
+<!-- 		spare1, -->
+
+<!-- 		spare2, -->
+<!-- 		spare3, -->
+<!-- 		spare4, -->
+		s_comment,
+		delete_flag
+		)
+		VALUES(
+		#{area_id},
+		#{park_id} ,
+		#{area_name} ,
+		#{space_number} ,
+		#{pay_free_time} ,
+<!-- 		#{picture_type} , -->
+<!-- 		#{picture_addr} , -->
+<!-- 		#{server_ip} , -->
+<!-- 		#{db_name} , -->
+
+<!-- 		#{db_password} , -->
+<!-- 		#{day_number} , -->
+<!-- 		#{log_address} , -->
+<!-- 		#{spare1} , -->
+
+<!-- 		#{spare2} , -->
+<!-- 		#{spare3} , -->
+<!-- 		#{spare4} , -->
+		#{s_comment} ,
+		#{delete_flag}
+
+		)
+	</insert>
+
+	<select id="findInfo" parameterType="String"
+		resultType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		SELECT
+		t.area_id,
+		t.park_id,
+		t.area_name,
+		t.space_number,
+		t.pay_free_time,
+		t.picture_type,
+		t.picture_addr,
+		t.server_ip,
+		t.db_name,
+
+		t.db_password,
+		t.day_number,
+		t.log_address,
+		t.spare1,
+
+		t.spare2,
+		t.spare3,
+		t.spare4,
+		t.s_comment
+
+		FROM area_info t
+		WHERE t.area_id=#{value}
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update"
+		parameterType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		UPDATE area_info
+		SET
+		area_id=#{area_id} ,
+		area_name=#{area_name} ,
+		space_number=#{space_number} ,
+		pay_free_time=#{pay_free_time} ,
+		
+<!-- 		picture_type=#{picture_type} ,
+		picture_addr=#{picture_addr} ,
+		server_ip=#{server_ip} ,
+		db_name=#{db_name} ,
+
+		db_password=#{db_password} ,
+		day_number=#{day_number} ,
+		log_address=#{log_address} ,
+		spare1=#{spare1} ,
+
+		spare2=#{spare2} ,
+		spare3=#{spare3} ,
+		spare4=#{spare4} , -->
+		s_comment=#{s_comment}
+
+		WHERE area_id=#{area_id}
+	</update>
+
+	<update id="delete" parameterType="String">
+		update area_info
+		set delete_flag=1
+		WHERE area_id = #{value}
+	</update>
+	<update id="caseCadeDelete" parameterType="String">
+		update lane_info
+		set delete_flag=1
+		WHERE area_id = #{value}
+	</update>
+
+	<select id="loadAreaTree" parameterType="String" resultType="treeModel">
+		select t.area_id id,area_name name,park_id parentId,'true' isParent
+		,'2' nodeType
+		from area_info t
+		where park_id=#{value}
+		and t.delete_flag=0
+	</select>
+
+	<select id="findSameArea"
+		parameterType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean"
+		resultType="Integer">
+			select count(1) from area_info
+			where 
+			area_id=#{area_id}
+			and
+			park_id=#{park_id}
+		</select>
+		
+	
+	<select id="findAllList" parameterType="objectMap" resultType="objectMap">
+    	SELECT t.area_id,t.park_id,t.area_name,t.space_number,t.pay_free_time,t.create_time,t.last_modify_time,t.delete_flag
+		  FROM area_info t
+		 WHERE t.delete_flag=0
+		ORDER BY t.create_time desc
+    </select>
+	
+		
+		
+</mapper>

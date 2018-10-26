@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.EntryReport">
+
+	<!-- 查询对账明细数量 -->
+	<select id="findCountReport" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)
+		from statistics_report t
+		where t.lane_type = 3 and t.operator = 0
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.lane_id = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.operator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=null!=''">
+			and statistics_date <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and statistics_date <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+	</select>
+
+
+	<!-- 查询对账明细数据 -->
+	<select id="findReport" parameterType="objectMap" resultType="com.project.backMng.admin.report.model.StatisticsReportBean">
+		select park_id,area_id,lane_id,statistics_date,
+		flow_total,flow_etc,flow_plate,flow_manual,
+		(select park_name from park_info p where t.park_id = p.park_id) park_name,
+		(select area_name from area_info a where a.park_id = t.park_id and
+		a.area_id = t.area_id) area_name,
+		(select lane_name from lane_info l where l.park_id = t.park_id
+		and l.area_id = t.area_id and l.lane_id = t.lane_id) lane_name
+		from statistics_report t
+		where t.lane_type = 3 and t.operator = 0
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.lane_id = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.operator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=null">
+			and statistics_date <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and statistics_date <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+		order by statistics_date,park_id,area_id,lane_id
+	</select>
+
+
+	<!-- 查询数据列表 -->
+	<select id="findEntryDetialList" resultType="objectMap" parameterType="objectMap">
+		select t.mvlicense,t.entrydate,t.entrylane,t.entrytime,
+		(select lane_name from lane_info l where l.park_id = t.entrystation
+		and l.lane_id = t.entrylane) lanename,
+		(select lane_name from lane_info l where l.park_id = t.entrystation
+		and l.lane_id = t.entrylane) lanename,
+		t.entryoperator
+		from cur_entry t where
+		t.recordtype = 3
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and entrylane = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and entryoperator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=null">
+			and entrydate <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and entrydate <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+		order by entrydate asc
+	</select>
+	
+
+<!-- 查询出口数量 -->
+	<select id="findCountEntryList" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)
+		from cur_entry t where
+		t.recordtype = 3
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.entrystation = #{query_park_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.entrylane = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.entryoperator = #{query_operator}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and t.entrydate = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!='' and query_pay_method!=9">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!='' and query_pay_method==9">
+			and t.paymethod in (9,10)
+		</if>
+	</select>
+	
+	
+	
+<!-- 查询出口数量 -->
+	<select id="findEntryList" parameterType="objectMap"
+		resultType="objectMap">
+		select t.mvlicense,t.entrydate date,t.entrylane,t.entrytime time,
+		(select lane_name from lane_info l where l.park_id = t.entrystation
+		and l.lane_id = t.entrylane) lanename,
+		t.entryoperator
+		from cur_entry t where
+		t.recordtype = 3
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.entrystation = #{query_park_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.entrylane = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.entryoperator = #{query_operator}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and t.entrydate = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!='' and query_pay_method!=9">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!='' and query_pay_method==9">
+			and t.paymethod in (9,10)
+		</if>
+	</select>
+
+
+	<!-- 查询数据列表 -->
+	<select id="queryLaneList" resultType="objectMap">
+		SELECT
+		lane_id,
+		lane_name
+		FROM lane_info
+		WHERE delete_flag=0
+		and lane_flag = 1
+	</select>
+
+
+</mapper>

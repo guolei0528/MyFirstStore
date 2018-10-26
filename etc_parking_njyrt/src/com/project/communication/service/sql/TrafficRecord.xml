@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="communication.TrafficRecord">
+	<select id="findLaneInfo" parameterType="String" resultType="com.project.backMng.platuser.sys.LaneInfoMng.model.LaneInfoBean">
+		SELECT 
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+			t.lane_flag,
+			t.lane_name,
+			t.spare1,
+			t.spare2,
+			t.spare3,
+			t.spare4,
+				
+			t.s_comment
+		  FROM lane_info t
+        WHERE t.lane_id=#{VALUE}
+	
+	</select>
+	 <select id="findList" parameterType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean" resultType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+    	SELECT 
+			t.traffic_date,
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+				
+			t.lane_flag,
+			t.care_traffic,
+			t.pay_method,
+			t.member_type,
+				
+			DATE_FORMAT(t.datetime,'%Y-%m-%d')datetime,
+			t.s_comment
+		  FROM care_traffic_record t
+		  where traffic_date=#{traffic_date}
+		  and park_id=#{park_id}
+		  and area_id=#{area_id}
+		  and lane_id=#{lane_id}
+		  and lane_flag=#{lane_flag}
+		 <if test="pay_method!=null and pay_method!=''">
+		  and pay_method=#{pay_method}
+		  </if>
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+    	INSERT INTO care_traffic_record(
+				traffic_date,
+				park_id,
+				area_id,
+				lane_id,
+			
+				lane_flag,
+				care_traffic,
+				pay_method,
+				member_type,
+			
+				datetime,
+				s_comment
+				)
+		VALUES(
+				#{traffic_date} ,
+				#{park_id} ,
+				#{area_id} ,
+				#{lane_id} ,
+			
+				#{lane_flag} ,
+				1 ,
+				#{pay_method} ,
+				#{member_type} ,
+			
+				now() ,
+				#{s_comment} 
+		)
+    </insert>
+        
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+		UPDATE care_traffic_record
+		SET 
+			care_traffic=care_traffic+1
+			datetime=now() 
+ 		where traffic_date=#{traffic_date}
+		  and park_id=#{park_id}
+		  and area_id=#{area_id}
+		  and lane_id=#{lane_id}
+		  and lane_flag=#{lane_flag}
+		  <if test="pay_method!=null and pay_method!=''">
+		  and pay_method=#{pay_method}
+		  </if>
+    </update>
+    
+       <select id="validMember" parameterType="String" resultType="String">
+    	select member_type
+    	from member_sale_info
+    	where begin_time<![CDATA[<=]]>now()
+    	and end_time <![CDATA[>=]]>now()
+    	and member_id=#{value}
+    
+    </select>
+     <select id="findMemberInCarInfo" parameterType="objectMap" resultType="String">
+    
+    	select member_id from car_info
+    	where mv_license=#{mv_license}
+    	and car_color=#{car_color}
+    	and delete_flag=0
+    
+    </select>
+    
+    <select id="findIncomeList" parameterType="com.project.communication.model.IncomeCountBean" resultType="com.project.communication.model.IncomeCountBean">
+    	select income_date,
+    	park_id,
+    	area_id,
+    	lane_id,
+    	income_count,
+    	real_bill,
+    	etc_bill,
+    	mobile_bill,
+    	member_type,
+    	date_time
+    	from income_count
+    	where income_date=#{income_date}
+    	and park_id=#{park_id}
+    	and area_id=#{area_id}
+    	and lane_id=#{lane_id}
+    	and member_type=#{member_type}
+    </select>
+    <insert id="insertIncomeCount" parameterType="com.project.communication.model.IncomeCountBean">
+    	insert into income_count
+    	(
+    	income_date,
+    	park_id,
+    	area_id,
+    	lane_id,
+    	income_count,
+    	real_bill,
+    	etc_bill,
+    	mobile_bill,
+    	member_type,
+    	date_time
+    	
+    	)
+    	values(
+    	#{income_date},
+    	#{park_id},
+    	#{area_id},
+    	#{lane_id},
+    	#{income_count},
+    	#{real_bill},
+    	#{etc_bill},
+    	#{mobile_bill},
+    	#{member_type},
+    	now()
+    	
+    	)
+    </insert>
+    <update id="updateIncomeCount" parameterType="com.project.communication.model.IncomeCountBean">
+    	update income_count
+    	set 
+    	real_bill=real_bill+#{real_bill},
+    	etc_bill=etc_bill+#{etc_bill},
+    	mobile_bill=mobile_bill+#{mobile_bill},
+    	date_time=now()
+    	where income_date=#{income_date}
+    	and park_id=#{park_id}
+    	and area_id=#{area_id}
+    	and lane_id=#{lane_id}
+    	and member_type=#{member_type} 
+    	
+    </update>
+	
+</mapper>

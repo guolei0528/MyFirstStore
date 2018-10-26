@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="communication.communicationCarInfo">
+  <resultMap id="communicationCarInfoResultMap" type="communicationCarInfoBean">
+    <id column="mv_license" jdbcType="VARCHAR" property="mvLicense" />
+    <id column="color" jdbcType="VARCHAR" property="color" />
+    <id column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    <id column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="obu_id" jdbcType="VARCHAR" property="obuId" />
+    <result column="member_id" jdbcType="VARCHAR" property="memberId" />
+    <result column="license" jdbcType="VARCHAR" property="license" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="s_comment" jdbcType="VARCHAR" property="sComment" />
+    <result column="spare1" jdbcType="INTEGER" property="spare1" />
+    <result column="spare2" jdbcType="INTEGER" property="spare2" />
+    <result column="spare3" jdbcType="VARCHAR" property="spare3" />
+    <result column="spare4" jdbcType="VARCHAR" property="spare4" />
+  </resultMap>
+
+
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM park_void_card t
+		 WHERE 1=1
+		 <if test="query_in_time_from!=null and query_in_time_from!=''">
+		 	and t.in_time<![CDATA[>=]]>#{query_in_time_from}
+		 </if>
+		 <if test="query_in_time_to!=null and query_in_time_to!=''">
+		 	and t.in_time<![CDATA[<=]]>#{query_in_time_to}
+		 </if>
+		 <if test="query_cancel_time_from!=null and query_cancel_time_from!=''">
+		 	and t.cancel_time<![CDATA[>=]]>#{query_cancel_time_from}
+		 </if>
+		 <if test="query_cancel_time_to!=null and query_cancel_time_to!=''">
+		 	and t.cancel_time<![CDATA[<=]]>#{query_cancel_time_to}
+		 </if>
+		 <if test="query_mv_license!=null and query_mv_license!=''">
+		 	and t.mv_license like CONCAT('%',#{query_mv_license},'%')
+		 </if>
+		 <if test="query_b_list_type!=null and query_b_list_type!=''">
+		 	and t.b_list_type=#{query_b_list_type}
+		 </if>
+    </select>
+    
+    <!-- 查询车牌号 -->
+    <select id="findMvlicense" parameterType="objectMap" resultMap="communicationCarInfoResultMap">
+    	SELECT 
+			t.mv_license,
+			t.obu_id,
+			t.type
+		  FROM car_info t
+		 WHERE delete_flag = 0
+		 	and t.obu_id=#{oub_id}
+		 	and car_color=#{car_color}
+    </select>
+    
+    <!-- 查询obuid -->
+    <select id="findObuId" parameterType="objectMap" resultMap="communicationCarInfoResultMap">
+    	SELECT 
+    	    t.mv_license,
+			t.obu_id,
+			t.type
+		  FROM car_info t
+		 WHERE delete_flag = 0
+		 	and t.mv_license=#{mv_license}
+		 		and car_color=#{car_color}
+    </select>
+    <select id="findMvlicenseLiTempCost" parameterType="objectMap" resultType="Integer">
+    	select count(1) from temp_cost 
+    	where mv_license = #{mv_license}
+    	 <if test="car_color!=null and car_color!=''">
+    		and car_color=#{car_color}
+		 </if>
+		 <if test="vehicle_class!=null and vehicle_class!=''">
+		    and vehicle_class=#{vehicle_class}
+		 </if>
+		 <if test="park_id!=null and park_id!=''">
+    		and park_id=#{park_id}
+		 </if>
+		 <if test="area_id!=null and area_id!=''">
+		    and area_id=#{area_id}
+		 </if>
+    </select>
+    <select id="validCard" parameterType="String" resultType="objectMap">
+    	select mv_license,'01' valid_type from police_void_card
+    	where mv_license=#{value}
+    	union all
+    	select mv_license,'02' valid_type from park_void_card
+    	where mv_license=#{value}
+    	union all
+    	select mv_license,'03' valid_type from etc_void_card
+    	where mv_license=#{value}
+    	union all
+    	select mv_license,'04' valid_type from txb_void_card
+    	where mv_license=#{value}
+    </select>
+    
+    <select id="validWhiteList" parameterType="objectMap" resultType="Integer">
+    	select count(1)from white_list
+    	where mv_license=#{mv_license}
+    	and color=#{car_color}
+    	and delete_flag=0
+    </select>
+    
+    <select id="findMemberInCarInfo" parameterType="objectMap" resultType="String">
+    	select member_id from car_info
+    	where mv_license=#{mv_license}
+    	and car_color=#{car_color}
+    	and delete_flag=0
+    </select>
+    <select id="validMember" parameterType="String" resultType="String">
+    	select member_type
+    	from member_sale_info
+    	where begin_time<![CDATA[<=]]>now()
+    	and end_time <![CDATA[>=]]>now()
+    	and member_id=#{value}
+    	and member_type!='00'
+    </select>
+    <select id="validExistMember" parameterType="String" resultType="Integer">
+    	select count(1) from temp_cost t 
+    	where t.mv_license in
+    	(select mv_license from car_info where member_id=#{value})
+    </select>
+</mapper>

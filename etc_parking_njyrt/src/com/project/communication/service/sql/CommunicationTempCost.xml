@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="communication.communicationTempCost">
+	<!-- 更改为已支付状态，赋值金额 -->
+	<update id="updateStatus" parameterType="objectMap">
+		update temp_cost
+		set
+		<if test="trml_park_id!=null and trml_park_id!=''">
+			trml_park_id=#{trml_park_id},
+		</if>
+		<if test="trml_area_id!=null and trml_area_id!=''">
+			trml_area_id=#{trml_area_id},
+		</if>
+		<if test="terminal_id!=null and terminal_id!=''">
+			terminal_id=#{terminal_id},
+		</if>
+		pay_method=#{pay_method},pay_status=#{pay_status},pay_time=#{pay_time},prepay_bill=prepay_bill+#{prepay_bill}
+		where mv_license = #{mv_license,jdbcType=VARCHAR}
+		<if test="car_color!=null">
+			and car_color = #{car_color,jdbcType=INTEGER}
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		<if test="entry_lane!=null and entry_lane!=0">
+			and entry_lane=#{entry_lane}
+		</if>
+		<if test="entry_time!=null">
+			and entry_time=#{entry_time}
+		</if>
+	</update>
+
+
+	<!-- 查询临时计费 -->
+	<select id="findParkInfo" parameterType="objectMap"
+		resultType="com.project.communication.model.CommunicationTempCostBean">
+		SELECT
+		t.park_id,
+		t.area_id,
+		t.entry_lane,
+		t.entry_time,
+		t.car_color
+		FROM
+		temp_cost t
+		where t.mv_license = #{mv_license}
+		<if test="car_color!=null and car_color!=''">
+			and car_color=#{car_color}
+		</if>
+	</select>
+
+
+	<!-- 根据车牌查询数据列表   -->
+	<select id="findWhiteByLicense" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.vehicle_class,t.toll_type,t.charge_code,t.spare1,t.spare2,t.user_number
+		FROM white_list t
+		where delete_flag = 0
+		and t.mv_license = #{mvLicense}
+		<if test="carColor!=null and carColor!=''">
+			and t.color=#{carColor}
+		</if>
+		and t.valid_start_time <![CDATA[<=]]>
+		now()
+		and t.valid_end_time <![CDATA[>=]]>
+		now()
+		and t.status in (3,5,7)
+		<if test="laneInfo!=null and laneInfo!=''">
+			and t.lane_info like CONCAT('%',#{laneInfo},'%')
+		</if>
+		order by create_time desc
+		limit 1
+	</select>
+
+
+	<!-- 根据obu编号查询数据列表 -->
+	<select id="findWhiteByOBUId" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.vehicle_class,t.toll_type,t.charge_code,t.spare1,t.spare2,t.user_number
+		FROM white_list t
+		where delete_flag = 0
+		and t.mv_license = #{mvLicense}
+		and t.obu_id = #{obuId}
+		and t.valid_start_time <![CDATA[<=]]>
+		now()
+		and t.valid_end_time <![CDATA[>=]]>
+		now()
+		and t.status in (3,5,7)
+		<if test="laneInfo!=null and laneInfo!=''">
+			and t.lane_info like CONCAT('%',#{laneInfo},'%')
+		</if>
+		limit 1
+	</select>
+	
+	
+	
+	<!-- 根据车牌查询数据列表   -->
+	<select id="findAllVaildWhiteByLicense" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.valid_start_time,t.valid_end_time,t.vehicle_class,t.toll_type,
+		t.charge_code,t.spare1,t.spare2,t.user_number
+		FROM white_list t
+		where delete_flag = 0
+		and t.mv_license = #{mvLicense}
+		<if test="carColor!=null and carColor!=''">
+			and t.color=#{carColor}
+		</if>
+		and t.status in (3,5,7)
+		<if test="laneInfo!=null and laneInfo!=''">
+			and t.lane_info like CONCAT('%',#{laneInfo},'%')
+		</if>
+		order by create_time desc
+		limit 1
+	</select>
+
+
+	<!-- 根据obu编号查询数据列表 -->
+	<select id="findAllVaildWhiteByOBUId" parameterType="objectMap"
+		resultType="com.project.backMng.admin.whiteListMng.model.WhiteListMngBean">
+		SELECT
+		t.valid_start_time,t.valid_end_time,
+		t.vehicle_class,t.toll_type,t.charge_code,
+		t.spare1,t.spare2,t.user_number
+		FROM white_list t
+		where delete_flag = 0
+		and t.mv_license = #{mvLicense}
+		and t.obu_id = #{obuId}
+		and t.status in (3,5,7)
+		<if test="laneInfo!=null and laneInfo!=''">
+			and t.lane_info like CONCAT('%',#{laneInfo},'%')
+		</if>
+		limit 1
+	</select>
+
+
+
+	<!-- 查询支付免费时间 -->
+	<select id="findArea" parameterType="objectMap"
+		resultType="com.project.backMng.platuser.sys.AreaInfoMng.model.AreaInfoBean">
+		SELECT pay_free_time,charge_code
+		FROM area_info t
+		WHERE t.park_id = #{park_id}
+		AND t.area_id = #{area_id}
+	</select>
+
+
+	<!-- 保存集中收费支付信息 -->
+	<insert id="savePayTempCost">
+		insert into temp_cost
+		(mv_license,car_color,vehicle_class,park_id,area_id,entry_lane,pay_status,
+		trml_park_id,trml_area_id,terminal_id,pay_method,prepay_bill,entry_time,entry_date,pay_time,is_vaild,date_time,is_model)
+		VALUES
+		(#{mv_license},#{car_color},#{vehicle_class},#{park_id},#{area_id},#{entry_lane},
+		#{pay_status},#{trml_park_id},#{trml_area_id},#{terminal_id},#{pay_method},#{prepay_bill},#{entry_time},#{entry_date},#{pay_time},#{is_vaild},now(),#{is_model})
+	</insert>
+
+
+	<!-- 根据车牌入口时间停车场编号、入口车道号判断是否存在 -->
+	<select id="countCenterPay" parameterType="objectMap"
+		resultType="int">
+		select count(1) from cur_centerpay
+		where mvlicense = #{mv_license,jdbcType=VARCHAR}
+		<if test="entry_time!=null">
+			and DATE_FORMAT(entrytime,'%Y-%m-%d %H:%i:%s') =
+			DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and entrystation = #{park_id}
+		</if>
+		<if test="entry_lane!=null">
+			and entrylane=#{entry_lane}
+		</if>
+	</select>
+
+
+	<!-- 查询集中收费是否为模拟计费 -->
+	<select id="findCenterPayKind" parameterType="objectMap"
+		resultType="int">
+		select specialkind from cur_centerpay
+		where mvlicense = #{mv_license,jdbcType=VARCHAR}
+		<if test="entry_time!=null">
+			and DATE_FORMAT(entrytime,'%Y-%m-%d %H:%i:%s') =
+			DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and entrystation = #{park_id}
+		</if>
+		<if test="entry_lane!=null">
+			and entrylane=#{entry_lane}
+		</if>
+	</select>
+
+
+	<!-- 根据车牌查询入口图片 -->
+	<select id="findEntryImage" parameterType="objectMap"
+		resultType="String">
+		select entry_image from temp_cost
+		where mv_license = #{mv_license,jdbcType=VARCHAR}
+	</select>
+
+
+
+	<!-- 根据车道编号返回车牌 -->
+	<select id="findTriggerLicense" parameterType="objectMap"
+		resultType="String">
+		select veh_plate from tmp_trigger
+		where lane_id = #{lane_id,jdbcType=INTEGER}
+	</select>
+
+	<!-- 根据车道编号返回车牌 -->
+	<select id="findTriggerIp" parameterType="objectMap" resultType="String">
+		select ip from tmp_trigger
+		where lane_id = #{lane_id,jdbcType=INTEGER}
+	</select>
+
+	<!-- 根据验证码返回优惠券 -->
+	<select id="findCouponByVerifyCode" parameterType="String"
+		resultType="com.project.backMng.admin.coupon.model.CouponMngBean">
+		SELECT t.coupon_code,t.status,t.coupon_type,t.coupon_toll
+		FROM coupon t
+		WHERE t.verify_code = #{verify_code}
+		and t.status = 1
+		and t.start_time <![CDATA[<=]]>
+		now()
+		and t.end_time <![CDATA[>=]]>
+		now()
+	</select>
+
+	<!-- 根据返回验证码 -->
+	<select id="findVerifyCodeByTmpTrigger" parameterType="objectMap"
+		resultType="String">
+		SELECT verify_code
+		FROM tmp_trigger
+		WHERE 
+		park_id = #{park_id,jdbcType=VARCHAR}
+		and area_id = #{area_id,jdbcType=VARCHAR}
+		and lane_id = #{lane_id,jdbcType=INTEGER}
+		and veh_plate = #{veh_plate,jdbcType=INTEGER}
+	</select>
+
+	<!-- 更改为已支付状态，赋值金额 -->
+	<update id="updateCouponByVerifyCode" parameterType="objectMap">
+		update
+		coupon
+		set status=#{status}
+		where verify_code =
+		#{verify_code,jdbcType=VARCHAR}
+	</update>
+
+
+	<!-- 查询集中收费金额 -->
+	<select id="findExitToll" parameterType="objectMap"
+		resultType="int">
+		select sum(totaltoll) from cur_exit
+		where mvlicense = #{mv_license,jdbcType=VARCHAR}
+		<if test="entry_time!=null">
+			and DATE_FORMAT(entrytime,'%Y-%m-%d %H:%i:%s') =
+			DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and entrystation = #{park_id}
+		</if>
+		<if test="entry_lane!=null">
+			and entrylane=#{entry_lane}
+		</if>
+	</select>
+
+
+   <select id="findTempCostToll" parameterType="objectMap" resultType="Integer">
+    	select sum(prepay_bill) from temp_cost 
+    	where mv_license = #{mv_license}
+    	 <if test="car_color!=null and car_color!=''">
+    		and car_color=#{car_color}
+		 </if>
+		 <if test="vehicle_class!=null and vehicle_class!=''">
+		    and vehicle_class=#{vehicle_class}
+		 </if>
+		 <if test="park_id!=null and park_id!=''">
+    		and park_id=#{park_id}
+		 </if>
+		 <if test="area_id!=null and area_id!=''">
+		    and area_id=#{area_id}
+		 </if>
+		 <if test="lane_id!=null and lane_id!=''">
+		    and lane_id=#{lane_id}
+		 </if>
+		 <if test="entry_time!=null">
+			and DATE_FORMAT(entry_time,'%Y-%m-%d %H:%i:%s') =
+			DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+    </select>
+
+
+	<!-- 对白名单计费标准为月支付的进行累计上限金额    -->
+	<update id="whiteListMonthPay" parameterType="objectMap">
+		update
+		white_list
+		set pay_toll=ifnull(pay_toll,0)+#{pay_toll},
+		park_time=ifnull(park_time,0)+#{park_time},
+		payfreq=ifnull(payfreq,0)+1,
+		paytime=#{paytime}
+		where mv_license = #{mv_license}
+		<if test="carColor!=null and carColor!=''">
+			and color=#{carColor}
+		</if>
+		and valid_start_time <![CDATA[<=]]>
+		now()
+		and valid_end_time <![CDATA[>=]]>
+		now()
+		and status in (3,5,7)
+		<if test="laneInfo!=null and laneInfo!=''">
+			and lane_info like CONCAT('%',#{laneInfo},'%')
+		</if>
+	</update>
+	
+	<select id="queryWhiteByLicense" parameterType="objectMap" resultType="com.project.communication.model.WhiteListInfoBean">
+		SELECT
+			mv_license,
+			color,
+			obu_id,
+			vehicle_class,
+			delete_flag,
+			toll_type,
+			charge_code,
+			valid_start_time,
+			valid_end_time,
+			status,
+			user_number,
+			spare1,
+			spare2
+		FROM
+			white_list
+		WHERE 
+			delete_flag = 0
+		and valid_start_time <![CDATA[<=]]>
+		now()
+		and valid_end_time <![CDATA[>=]]>
+		now()
+		and status in (3,5,7)
+		<choose>
+			<when test="mv_license!=null and mv_license!=''">
+				AND mv_license = #{mv_license}
+			</when>
+			<otherwise>
+				<if test="obu_id!=null and obu_id!=''">
+					AND obu_id = #{obu_id}
+				</if>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="queryTempByUserNumber" parameterType="String" resultType="com.project.communication.model.TempCostInfoBean">
+		SELECT
+			park_id,
+			area_id,
+			entry_lane,
+			entry_time,
+			vehicle_class,
+			mv_license,
+			car_color,
+			entry_image
+		FROM
+			temp_cost
+		WHERE
+			is_vaild!=0 AND spare4 = #{usernumber}
+		ORDER BY
+			entry_time DESC
+		LIMIT 1
+	</select>
+	<select id="queryTempByLicense" parameterType="String" resultType="com.project.communication.model.TempCostInfoBean">
+		SELECT
+			park_id,
+			area_id,
+			entry_lane,
+			entry_time,
+			vehicle_class,
+			mv_license,
+			car_color,
+			entry_image,
+			begin_time,
+			pay_status,
+			pay_method,
+			pay_time,
+			prepay_bill,
+			spare1
+		FROM
+			temp_cost
+		WHERE
+			is_vaild!=0 AND mv_license = #{license}
+	</select>
+
+	<!-- 更改为已支付状态，赋值金额 -->
+	<update id="updateFreeCount" parameterType="objectMap">
+		update white_list
+		set spare1 = #{count} 
+		where mv_license = #{mv_license}  
+	</update>
+	
+	
+<!-- 	查询存在多少辆车相同工号的车 -->
+	<select id="countTempCostByUserName" parameterType="objectMap"
+		resultType="int">
+		select count(1) from temp_cost
+		where is_vaild != 0
+		and spare4 = #{spare4,jdbcType=VARCHAR}
+		<if test="park_id!=null and park_id!=''">
+			and park_id = #{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id = #{area_id}
+		</if>
+	</select>
+	
+	
+	<!-- 根据工号更新剩余可用车位数 -->
+	<update id="updateWhiteSpaceByUserName" parameterType="objectMap">
+		update white_list
+		set spare2 = (spare1-#{use_place})
+		where 
+		delete_flag = 0
+		and valid_start_time <![CDATA[<=]]>
+		now()
+		and valid_end_time <![CDATA[>=]]>
+		now()
+		and status in (3,5,7)
+		and user_number = #{user_number}
+	</update>
+	
+		<!-- 根据工号更新剩余可用车位数 -->
+	<update id="updateWhiteSpaceByUserNum" parameterType="objectMap">
+		update white_list
+		set spare2 = spare2 + #{step}  
+		where 
+		delete_flag = 0
+		and valid_start_time <![CDATA[<=]]>
+		now()
+		and valid_end_time <![CDATA[>=]]>
+		now()
+		and status in (3,5,7)
+		and user_number = #{user_number}  
+	</update>
+	
+	<update id="deleteTempCostByEntryTime" parameterType="objectMap">
+		delete from
+		temp_cost where 1=1
+		<if test="car_color!=null">
+			and car_color=#{car_color}
+		</if>
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		<if test="entry_lane!=null and entry_lane!=0">
+			and entry_lane=#{entry_lane}
+		</if>
+		and DATE_FORMAT(entry_time,'%Y-%m-%d %H:%i:%s') = DATE_FORMAT(#{entry_time},'%Y-%m-%d %H:%i:%s')
+	</update>
+	
+	
+<!-- 	根据车牌返回车位编号 -->
+	<select id="userNumTempCostByLicense" parameterType="objectMap"
+		resultType="String">
+		SELECT spare4
+		FROM temp_cost t
+		where t.mv_license =
+		#{mv_license}
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and t.area_id=#{area_id}
+		</if>
+		and t.mv_license not like
+		'%无牌车%'
+	</select>
+	
+	
+	<!-- 	根据车牌返回车位编号 -->
+	<select id="findTCNumStatusByLicense" parameterType="objectMap"
+		resultType="objectMap">
+		SELECT spare1,spare4
+		FROM temp_cost t
+		where t.mv_license =
+		#{mv_license}
+		<if test="park_id!=null and park_id!=''">
+			and t.park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and t.area_id=#{area_id}
+		</if>
+		and t.mv_license not like
+		'%无牌车%'
+	</select>
+	
+	
+<!-- 	根据车位编号、车位状态排序修改入口时间第一条数据,spare1=2,begin_time等于出去时间 -->
+	<update id="updateTCNumStatusByNum" parameterType="objectMap">
+		update temp_cost set 
+		spare1 = 2,begin_time=#{exit_time}
+		where spare4 = #{spare4}
+		and spare1 = 1
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		order by entry_time asc limit 1
+	</update>
+	
+	
+<!-- 	根据入口时间递增排列更新拥有车位数的相同车位编号      -->
+	<update id="updateTCUsePlaceByNumCanUsePlace">
+		update temp_cost set 
+		spare1 = #{spare1}
+		where spare4 = #{spare4}
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+		order by entry_time asc limit #{canuse_place}
+	</update>
+	
+	
+	<!-- 	根据入口时间递增排列更新拥有车位数的相同车位编号    -->
+	<update id="updateTCUsePlaceByNum">
+		update temp_cost set 
+		spare1 = #{spare1}
+		where spare4 = #{spare4}
+		<if test="park_id!=null and park_id!=''">
+			and park_id=#{park_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and area_id=#{area_id}
+		</if>
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backCharge.tempCharge.whiteList">
+  <resultMap id="chargeWhiteListResultMap" type="whiteListBean">
+    <id column="mv_license" jdbcType="VARCHAR" property="mvLicense" />
+    <id column="color" jdbcType="VARCHAR" property="color" />
+    <id column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    <id column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="vehicle_class" jdbcType="INTEGER" property="vehicleClass" />
+    <result column="spare1" jdbcType="INTEGER" property="spare1" />
+    <result column="spare2" jdbcType="INTEGER" property="spare2" />
+    <result column="spare3" jdbcType="VARCHAR" property="spare3" />
+    <result column="spare4" jdbcType="VARCHAR" property="spare4" />
+  </resultMap>
+    
+    <!-- 查询数据列表 -->
+    <select id="findWhiteList" parameterType="objectMap" resultMap="chargeWhiteListResultMap">
+    	SELECT 
+    	    t.mv_license,
+			t.color,
+			t.vehicle_class
+		  FROM white_list t
+		  where delete_flag = 0 
+		  and t.valid_start_time <![CDATA[<=]]> now()
+		  and t.valid_end_time <![CDATA[>=]]> now()
+		  and t.status in (3,5,7)
+    </select>
+    
+    <insert id="insert" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	INSERT INTO t_plat_user(
+				ID,
+				NAME,
+				SEX,
+				WORK_NO,
+			
+				MOBILE,
+				REMARK,
+				CREATE_TIME,
+				LAST_MODIFY_TIME,
+			
+				IN_USE_FLAG,
+				DELETE_FLAG
+				)
+		VALUES(
+				#{ID} ,
+				#{NAME} ,
+				#{SEX} ,
+				#{WORK_NO} ,
+			
+				#{MOBILE} ,
+				#{REMARK} ,
+				now() ,
+				now() ,
+			
+				#{IN_USE_FLAG} ,
+				#{DELETE_FLAG} 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultMap="chargeWhiteListResultMap">
+        SELECT 
+            t.member_id,
+            t.name,
+			t.sex,
+			DATE_FORMAT(t.birthday,'%Y-%m-%d') birthday,
+			t.phone,
+			t.location,
+			DATE_FORMAT(t.last_modify_time,'%Y-%m-%d %H:%i:%s') last_modify_time
+		  FROM member t
+        WHERE t.member_id=#{member_id} and t.delete_flag=0
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.admin.member.model.MemberBean">
+		UPDATE member
+		SET 
+		    member_id=#{memberId} ,
+			name=#{name} ,
+			sex=#{sex} ,
+			birthday=#{birthday},
+			phone=#{phone},
+			location=#{location},
+			last_modify_time = now()
+		WHERE member_id=#{memberId}
+    </update>
+	
+    
+<!--     删除会员信息 -->
+    <update id="deleteMember" parameterType="String">
+    	UPDATE member
+		   SET DELETE_FLAG = 1
+		 WHERE member_id = #{member_id}
+    </update>
+    
+    <insert id="insertMember" parameterType="objectMap">
+    	INSERT INTO member(member_id, name, sex, birthday, phone, location,delete_flag,last_modify_time)
+		VALUES (#{member_id}, #{name}, #{sex}, #{birthday}, #{phone}, #{location},#{delete_flag},#{last_modify_time})
+    </insert>
+    
+    <update id="updateLoginUser" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	UPDATE t_login_user
+		SET
+			LOGIN_NAME=#{MOBILE},
+			IN_USE_FLAG=#{IN_USE_FLAG}
+		WHERE USER_ID=#{ID}
+    </update>
+    
+    <update id="deleteLoginUser" parameterType="String">
+    	UPDATE t_login_user
+		SET DELETE_FLAG=1
+		WHERE USER_ID=#{value}
+    </update>
+    
+    <update id="deleteUserRoleByUserId" parameterType="String">
+    	delete from t_role_user where USER_ID=#{value}
+    </update>
+    
+    <insert id="saveUserRoleByUserId" parameterType="objectMap">
+    	INSERT INTO t_role_user(ROLE_ID, USER_ID, RELATED_TIME)
+		VALUES (#{ROLE_ID}, #{USER_ID}, NOW())
+    </insert>
+    
+</mapper>

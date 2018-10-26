@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="reportForms.entrance">
+  
+  <resultMap type="com.project.reportForms.model.InOrOutFlowInfo" id="entranceMap">
+  	<result column="paymethod" property="type" jdbcType="INTEGER"/>
+  	<result column="flow" property="num" jdbcType="INTEGER"/>
+  </resultMap>
+  
+  <!-- 查询入口信息 -->
+  <select id="countEntrance" parameterType="objectMap" resultMap="entranceMap">
+  	SELECT paymethod,COUNT(*) flow
+	FROM cur_entry
+	WHERE entrystation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+		AND entrydate=#{ymd,jdbcType=INTEGER} 
+	</if>
+	<if test="time!=null">
+		AND to_days(entrytime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+	</if>
+	AND recordtype=3
+	GROUP BY paymethod
+  </select>
+  <!-- 查询当日入口总流量 -->
+  <select id="countTotalFlow" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*) flow
+	FROM cur_entry
+	WHERE entrystation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+		AND entrydate=#{ymd,jdbcType=INTEGER} 
+	</if>
+	<if test="time!=null">
+		AND to_days(entrytime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+	</if>
+	AND recordtype=3
+  </select>
+  <!-- 查询无人值守期间的流量 -->
+  <select id="countNightFlow" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*)
+	FROM (
+	SELECT 1
+	FROM cur_entry
+	WHERE entrystation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+		AND entrydate=#{ymd,jdbcType=INTEGER} 
+	</if>
+	<if test="time!=null">
+		AND to_days(entrytime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+	</if>
+	AND recordtype=3 AND HOUR(entrytime)=23 AND MINUTE(entrytime)&gt;=30
+	UNION ALL
+	SELECT 1
+	FROM cur_entry
+	WHERE entrystation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+		AND entrydate=#{ymd,jdbcType=INTEGER} 
+	</if>
+	<if test="time!=null">
+		AND to_days(entrytime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+	</if>
+	AND recordtype=3 AND HOUR(entrytime)&lt;6) t
+  </select>
+  <!-- 查询某天驶入的车辆牌照 -->
+  <select id="getLicensesByDay" parameterType="objectMap" resultType="String">
+  	SELECT mvlicense
+	FROM cur_entry
+	WHERE TO_DAYS(entrytime)=TO_DAYS(#{ymd,jdbcType=VARCHAR}) AND recordtype=3 AND entrystation=#{parkid,jdbcType=VARCHAR}
+  </select>
+  <!-- 统计某天驶入的流量 -->
+  <select id="countFlow" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*)
+	FROM cur_entry
+	WHERE TO_DAYS(entrytime)=TO_DAYS(#{ymd,jdbcType=VARCHAR}) AND recordtype=3 AND entrystation=#{parkid,jdbcType=VARCHAR}
+  </select>
+</mapper>

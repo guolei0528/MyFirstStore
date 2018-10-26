@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.transitRecord.EntryMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM cur_entry t
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and entrytime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and entrylane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		lane.park_id parkid,
+		lane.area_id areaid,
+		p.park_name park_name,
+		a.area_name area_name,
+		t.entrystation,
+		t.entrylane,
+		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		t.entrydate,
+		t.imagepath,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d')programstarttime
+		FROM cur_entry t
+		left join lane_info lane on lane.lane_id = t.entrylane
+		left join park_info p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id = a.area_id
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and entrytime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_exit_time_from!=null and query_exit_time_from!=''">
+			and exittime <![CDATA[>=]]>
+			#{query_exit_time_from}
+		</if>
+		<if test="query_exit_time_to!=null and query_exit_time_to!=''">
+			and exittime <![CDATA[<=]]>
+			#{query_exit_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and entrylane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		ORDER BY t.entrytime desc
+		limit #{skipSize},#{pageSize}
+	</select>
+
+
+	<insert id="insert"
+		parameterType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		INSERT INTO cur_entry(
+		recordno,
+		cardnetwork,
+		cardid,
+		parkid,
+
+		areaid,
+		entrystation,
+		entrylane,
+		entrytime,
+
+		entryoperator,
+		entryshift,
+		autovlicense,
+		mvlicense
+
+		)
+		VALUES(
+		#{recordno} ,
+		#{cardnetwork} ,
+		#{cardid} ,
+		#{parkid} ,
+
+		#{areaid} ,
+		#{entrystation} ,
+		#{entrylane} ,
+		#{entrytime} ,
+
+		#{entryoperator} ,
+		#{entryshift} ,
+		#{autovlicense} ,
+		#{mvlicense}
+
+		)
+	</insert>
+
+	<select id="findInfo" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		t.entrydate,
+		lane.park_id parkid,
+		lane.area_id areaid,
+		t.imagepath,
+		t.entrystation,
+		t.entrylane,
+		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		t.vehiclekind,
+		t.autovlicense,
+		t.etctermcode,
+		t.etcobuid,
+		t.etctac,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d %H:%i:%s')programstarttime,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		t.vehicleclass
+		FROM cur_entry t,lane_info lane
+		WHERE t.entrylane=#{entrylane}
+		and mvlicense=#{mvlicense}
+		and entrytime=#{entrytime}
+		and lane.lane_id=t.entrylane
+	</select>
+	<select id="findHisInfo" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		t.entrydate,
+		lane.park_id parkid,
+		lane.area_id areaid,
+		t.imagepath,
+		t.entrystation,
+		t.entrylane,
+		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		t.vehiclekind,
+		t.autovlicense,
+		t.etctermcode,
+		t.etcobuid,
+		t.etctac,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d %H:%i:%s')programstarttime,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		t.vehicleclass
+		FROM ${tableName} t,lane_info lane
+		WHERE t.entrylane=#{entrylane}
+		and mvlicense=#{mvlicense}
+		and entrytime=#{entrytime}
+		and lane.lane_id=t.entrylane
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update"
+		parameterType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		UPDATE cur_entry
+		SET
+		recordno=#{recordno} ,
+		cardnetwork=#{cardnetwork} ,
+		cardid=#{cardid} ,
+		parkid=#{parkid} ,
+
+		areaid=#{areaid} ,
+		entrystation=#{entrystation} ,
+		entrylane=#{entrylane} ,
+		entrytime=#{entrytime} ,
+
+		entryoperator=#{entryoperator} ,
+		entryshift=#{entryshift} ,
+		autovlicense=#{autovlicense} ,
+		mvlicense=#{mvlicense}
+
+		WHERE ID=#{ID}
+	</update>
+
+	<select id="findHisCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM ${tableName} t
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and entrytime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and entrylane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findHisList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		lane.park_id parkid,
+
+		lane.area_id areaid,
+		p.park_name park_name,
+		a.area_name area_name,
+		t.entrystation,
+		t.entrylane,
+		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		t.entrydate,
+		t.imagepath,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d')programstarttime
+
+		FROM ${tableName} t
+		left join lane_info lane on lane.lane_id = t.entrylane
+		left join park_info p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id = a.area_id
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and entrytime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and entrylane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		ORDER BY t.entrytime desc
+	</select>
+
+	<select id="findTimeoutCount" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		FROM cur_entry c,temp_cost t
+		where t.mv_license=c.autovlicense
+		and t.entry_lane=c.entrylane
+		and
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d,%H:%i')=DATE_FORMAT(c.entrytime,'%Y-%m-%d,%H:%i')
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and c.mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and c.entrylane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and c.entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and c.entrytime <![CDATA[<]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_time!=null and query_time!=''">
+
+			and TIMESTAMPDIFF(minute,c.entrytime,now())<![CDATA[>=]]>#{query_time}
+		</if>
+		<if test="query_is_vaild!=null and query_is_vaild!=''">
+			and t.is_vaild = #{query_is_vaild}
+		</if>
+	</select>
+	<select id="findTimeoutCarList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.EntryMng.model.EntryBean">
+		SELECT
+		c.recordno,
+		c.cardnetwork,
+		c.cardid,
+		t.park_id parkid,
+		t.area_id cardid,
+		p.park_name park_name,
+		a.area_name area_name,
+		c.entrystation,
+		c.entrylane,
+		DATE_FORMAT(c.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		c.entrydate,
+		c.imagepath,
+		c.entryoperator,
+		c.entryshift,
+		c.autovlicense,
+		c.mvlicense,
+		t.car_color
+		FROM (cur_entry c,temp_cost t)
+		left join lane_info lane on lane.lane_id = t.entry_lane
+		left join park_info
+		p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id =
+		a.area_id
+		where t.mv_license=c.autovlicense
+		and t.entry_lane=c.entrylane
+		and
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d,%H:%i')=DATE_FORMAT(c.entrytime,'%Y-%m-%d,%H:%i')
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and c.mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and c.entrylane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and c.entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and c.entrytime <![CDATA[<]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_time!=null and query_time!=''">
+
+			and TIMESTAMPDIFF(minute,c.entrytime,now())<![CDATA[>=]]>#{query_time}
+		</if>
+		<if test="query_is_vaild!=null and query_is_vaild!=''">
+			and t.is_vaild = #{query_is_vaild}
+		</if>
+
+	</select>
+
+	<select id="findExcessiveCount" parameterType="objectMap"
+		resultType="Integer">
+		SELECT count(1)
+		from temp_cost t,cur_entry c
+		where t.mv_license=c.autovlicense
+		and t.entry_lane=c.entrylane
+		and
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d,%H:%i')=DATE_FORMAT(c.entrytime,'%Y-%m-%d,%H:%i')
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and t.mv_license like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and t.entry_lane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and t.entry_time <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and t.entry_time <![CDATA[<]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_money!=null and query_money!=''">
+			and t.income_bill<![CDATA[>=]]>#{query_money}*100
+		</if>
+		<if test="query_is_vaild!=null and query_is_vaild!=''">
+			and t.is_vaild = #{query_is_vaild}
+		</if>
+	</select>
+
+
+	<select id="findExcessiveCarList" parameterType="objectMap"
+		resultType="objectMap">
+		select
+		t.mv_license,t.car_color,t.park_id,t.area_id,p.park_name,a.area_name,t.entry_lane,
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d %H:%i:%s')entry_time,c.entrydate,
+		CAST((t.income_bill/100) AS decimal(20,2))income_bill,
+		t.car_color,c.imagepath,c.entrystation
+		from (temp_cost t,cur_entry c)
+		left join lane_info lane on lane.lane_id = c.entrylane
+		left join park_info
+		p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id =
+		a.area_id
+		where t.mv_license=c.autovlicense
+		and t.entry_lane=c.entrylane
+		and
+		DATE_FORMAT(t.entry_time,'%Y-%m-%d,%H:%i')=DATE_FORMAT(c.entrytime,'%Y-%m-%d,%H:%i')
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and t.mv_license like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and t.entry_lane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and t.entry_time <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and t.entry_time <![CDATA[<]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_money!=null and query_money!=''">
+			and t.income_bill<![CDATA[>=]]>#{query_money}*100
+		</if>
+		<if test="query_is_vaild!=null and query_is_vaild!=''">
+			and t.is_vaild = #{query_is_vaild}
+		</if>
+	</select>
+
+	<select id="findPositionCount" parameterType="objectMap"
+		resultType="Integer">
+		select count(1) from area_info t
+		WHERE t.delete_flag=0
+		<if test="QUERY_AREA_ID!=null and QUERY_AREA_ID!=''">
+			and t.area_id like CONCAT('%',#{QUERY_AREA_ID},'%')
+		</if>
+		<if test="QUERY_AREA_NAME!=null and QUERY_AREA_NAME!=''">
+			and t.area_name like CONCAT('%',#{QUERY_AREA_NAME},'%')
+		</if>
+
+	</select>
+	<select id="findEmptyPosition" parameterType="objectMap"
+		resultType="objectMap">
+		<!-- select a.space_number-count() from area_info a,temp_cost temp -->
+		<!-- where a.area_id=temp.area_id and a.park_id=temp.park_id -->
+		<!-- and -->
+
+		<!-- select (a.space_number- (SELECT count(1) cars from temp_cost temp 
+			where temp.area_id=a.area_id and temp.park_id=a.park_id and temp.is_vaild 
+			= 1) ) space_number,a.park_id,a.area_id,a.area_name,a.server_ip from area_info 
+			a WHERE a.delete_flag=0 -->
+		select ifnull(s.totalspace-s.tmpcar-s.fixcar,a.space_number)
+		space_number,a.park_id,a.area_id,a.area_name,a.server_ip from area_info a
+		left join stock s on s.park_id = a.park_id and s.area_id = a.area_id
+		WHERE a.delete_flag=0
+		<if test="QUERY_AREA_ID!=null and QUERY_AREA_ID!=''">
+			and a.area_id like CONCAT('%',#{QUERY_AREA_ID},'%')
+		</if>
+		<if test="QUERY_AREA_NAME!=null and QUERY_AREA_NAME!=''">
+			and a.area_name like CONCAT('%',#{QUERY_AREA_NAME},'%')
+		</if>
+	</select>
+	<select id="findAreaInfo" resultType="objectMap" parameterType="String">
+		select (a.space_number-
+		(SELECT count(1) cars from temp_cost temp where temp.area_id=a.area_id and
+		temp.park_id=a.park_id)
+		) space_number,a.park_id,a.area_id,a.area_name,a.server_ip,
+		a.picture_addr,
+		a.db_name,
+		a.picture_type,
+
+		a.db_password,
+		a.day_number,
+		a.log_address,
+		a.s_comment
+
+		from area_info a
+		WHERE a.area_id=#{value}
+
+	</select>
+
+	<update id="deleteTempByLisce" parameterType="objectMap">
+		update temp_cost
+		set is_vaild = 0
+		WHERE mv_license = #{mv_license}
+		and car_color = #{car_color}
+	</update>
+
+</mapper>

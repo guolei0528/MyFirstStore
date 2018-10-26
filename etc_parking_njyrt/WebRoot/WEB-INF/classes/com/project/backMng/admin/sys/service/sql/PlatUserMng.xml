@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.sys.PlatUserMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM t_plat_user t
+		 WHERE t.DELETE_FLAG=0
+		 <if test="QUERY_NAME!=null and QUERY_NAME!=''">
+				AND t.NAME like CONCAT('%', #{QUERY_NAME}, '%')
+			</if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	SELECT 
+			t.ID,
+			t.NAME,
+			t.SEX,
+			t.WORK_NO,
+				
+			t.MOBILE,
+			t.REMARK,
+			DATE_FORMAT(t.CREATE_TIME,'%Y-%m-%d %H:%i:%s') CREATE_TIME,
+			DATE_FORMAT(t.LAST_MODIFY_TIME,'%Y-%m-%d %H:%i:%s') LAST_MODIFY_TIME,
+				
+			t.IN_USE_FLAG,
+			t.DELETE_FLAG
+		  FROM t_plat_user t
+		 WHERE t.DELETE_FLAG=0
+		 <if test="QUERY_NAME!=null and QUERY_NAME!=''">
+				AND t.NAME like CONCAT('%', #{QUERY_NAME}, '%')
+			</if>
+		ORDER BY t.CREATE_TIME desc
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	INSERT INTO t_plat_user(
+				ID,
+				NAME,
+				SEX,
+				WORK_NO,
+			
+				MOBILE,
+				REMARK,
+				CREATE_TIME,
+				LAST_MODIFY_TIME,
+			
+				IN_USE_FLAG,
+				DELETE_FLAG
+				)
+		VALUES(
+				#{ID} ,
+				#{NAME} ,
+				#{SEX} ,
+				#{WORK_NO} ,
+			
+				#{MOBILE} ,
+				#{REMARK} ,
+				now() ,
+				now() ,
+			
+				#{IN_USE_FLAG} ,
+				#{DELETE_FLAG} 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.admin.sys.model.PlatUserBean">
+        SELECT 
+			t.ID,
+			t.NAME,
+			t.SEX,
+			t.WORK_NO,
+				
+			t.MOBILE,
+			t.REMARK,
+			DATE_FORMAT(t.CREATE_TIME,'%Y-%m-%d %H:%i:%s') CREATE_TIME,
+			DATE_FORMAT(t.LAST_MODIFY_TIME,'%Y-%m-%d %H:%i:%s') LAST_MODIFY_TIME,
+				
+			t.IN_USE_FLAG,
+			t.DELETE_FLAG
+		  FROM t_plat_user t
+        WHERE t.ID=#{VALUE}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+		UPDATE t_plat_user
+		SET 
+			NAME=#{NAME} ,
+			SEX=#{SEX} ,
+			WORK_NO=#{WORK_NO} ,
+			MOBILE=#{MOBILE} ,
+			
+			REMARK=#{REMARK} ,
+			LAST_MODIFY_TIME=now() ,
+			IN_USE_FLAG=#{IN_USE_FLAG} 
+		WHERE ID=#{ID}
+    </update>
+	
+    <update id="delete" parameterType="String">
+    	UPDATE t_plat_user
+		   SET DELETE_FLAG = 1
+		 WHERE ID = #{value}
+    </update>
+    
+    <insert id="insertLoginUser" parameterType="objectMap">
+    	INSERT INTO t_login_user(USER_ID, LOGIN_NAME, PASSWORD, USER_TYPE, IN_USE_FLAG, DELETE_FLAG)
+		VALUES (#{USER_ID}, #{LOGIN_NAME}, #{PASSWORD}, #{USER_TYPE}, #{IN_USE_FLAG}, #{DELETE_FLAG})
+    </insert>
+    
+    <update id="updateLoginUser" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	UPDATE t_login_user
+		SET
+			LOGIN_NAME=#{MOBILE},
+			IN_USE_FLAG=#{IN_USE_FLAG}
+		WHERE USER_ID=#{ID}
+    </update>
+    
+    <update id="deleteLoginUser" parameterType="String">
+    	UPDATE t_login_user
+		SET DELETE_FLAG=1
+		WHERE USER_ID=#{value}
+    </update>
+    
+    <update id="deleteUserRoleByUserId" parameterType="String">
+    	delete from t_role_user where USER_ID=#{value}
+    </update>
+    
+    <insert id="saveUserRoleByUserId" parameterType="objectMap">
+    	INSERT INTO t_role_user(ROLE_ID, USER_ID, RELATED_TIME)
+		VALUES (#{ROLE_ID}, #{USER_ID}, NOW())
+    </insert>
+    
+</mapper>

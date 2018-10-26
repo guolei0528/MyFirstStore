@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+						http://www.springframework.org/schema/jdbc
+						http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-4.3.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">  
+	<!-- 数据源 --> 
+    <bean id="dataSource" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource" destroy-method="close">
+    	<property name="driverClassName" value="${driverClassName}" />
+        <property name="url" value="${url}" />
+        <property name="username" value="${username}" />
+        <property name="password" value="${password}" />
+        <property name="initialSize" value="${initialSize}" />
+        <property name="maxActive" value="${maxActive}" />
+        <property name="minIdle" value="${minIdle}" />
+        <property name="maxIdle" value="${maxIdle}" />
+        <property name="validationQuery" value="select 1"></property>
+        <property name="testWhileIdle" value="true"></property>
+        <property name="testOnBorrow" value="false"></property>
+        <property name="timeBetweenEvictionRunsMillis" value="30000"></property>
+        <property name="minEvictableIdleTimeMillis" value="1800000"></property>
+        <property name="numTestsPerEvictionRun" value="3"></property>
+    </bean>
+    
+    <!-- 事务 -->
+    <bean id="ibatisTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!-- advice -->
+    <tx:advice id="ibatisTxAdvice" transaction-manager="ibatisTransactionManager"> 
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="insert*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="merge*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="invaild*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="remove*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="tx*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+            <tx:method name="*" propagation="SUPPORTS" rollback-for="java.lang.Exception"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- aop config -->
+    <aop:config> 
+        <aop:pointcut id="ibatisServiceOperation" expression="execution(* com.project.*.*.*.service.*Service*.*(..))"/> 
+        <aop:advisor advice-ref="ibatisTxAdvice" pointcut-ref="ibatisServiceOperation"/>
+    </aop:config>
+    <!-- MYBATIS LOCATIONS -->
+    <bean id="sqlSessionFactory" class = "org.mybatis.spring.SqlSessionFactoryBean">
+	    <property name ="dataSource" ref = "dataSource"></property>
+	    <property name="configLocation" value="classpath:mybatisConfig.xml"/>
+    </bean> 
+    <!-- 本地的IBATIS SERVICE基类 -->
+    <bean id="baseService" class="com.redoak.jar.base.mybatis.service.BaseService" abstract="true">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+    </bean>
+    
+    <bean id="SpringUtil" class="com.redoak.jar.util.SpringUtil" scope="singleton"></bean>
+<!--     <bean id="InitStartService" class="com.project.sys.init.start.InitStartService" init-method="init" parent="baseService"> -->
+<!--     </bean> -->  
+
+<!--     <bean id="DynamicCalculationTempCostService" class="com.project.backCharge.tempCharge.service.DynamicCalculationTempCostService" init-method="init" parent="baseService"> -->
+<!--     </bean>   -->
+    
+    <bean id="DynamicUpdateImageService" class="com.project.backCharge.tempCharge.service.DynamicUpdateImageService" init-method="init" parent="baseService">
+    </bean>  
+</beans>

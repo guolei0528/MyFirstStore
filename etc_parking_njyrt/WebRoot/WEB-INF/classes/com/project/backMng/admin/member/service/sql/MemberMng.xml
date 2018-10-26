@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.member.MemberInfoMng">
+	<resultMap id="memberResultMap" type="memberBean">
+		<id column="member_id" jdbcType="VARCHAR" property="memberId" />
+		<result column="name" jdbcType="VARCHAR" property="name" />
+		<result column="sex" jdbcType="VARCHAR" property="sex" />
+		<result column="birthday" jdbcType="DATE" property="birthday" />
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+		<result column="location" jdbcType="VARCHAR" property="location" />
+		<result column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+		<result column="last_modify_time" jdbcType="TIMESTAMP"
+			property="lastModifyTime" />
+		<result column="spare1" jdbcType="INTEGER" property="spare1" />
+		<result column="spare2" jdbcType="INTEGER" property="spare2" />
+		<result column="spare3" jdbcType="VARCHAR" property="spare3" />
+		<result column="spare4" jdbcType="VARCHAR" property="spare4" />
+	</resultMap>
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM member t
+		WHERE 1=1
+		<if test="query_member_id!=null and query_member_id!=''">
+			AND t.member_id like CONCAT('%', #{query_member_id}, '%')
+		</if>
+		<if test="query_name!=null and query_name!=''">
+			AND t.name like CONCAT('%', #{query_name}, '%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap" resultMap="memberResultMap">
+		SELECT
+		t.member_id,
+		t.name,
+		t.sex,
+		DATE_FORMAT(t.birthday,'%Y-%m-%d') birthday,
+		t.phone,
+		t.location
+		FROM member t
+		WHERE 1=1
+		<if test="query_member_id!=null and query_member_id!=''">
+			AND t.member_id like CONCAT('%', #{query_member_id}, '%')
+		</if>
+		<if test="query_name!=null and query_name!=''">
+			AND t.name like CONCAT('%', #{query_name}, '%')
+		</if>
+		ORDER BY t.member_id asc
+	</select>
+
+
+	<select id="findInfo" parameterType="String" resultMap="memberResultMap">
+		SELECT
+		t.member_id,
+		t.name,
+		t.sex,
+		DATE_FORMAT(t.birthday,'%Y-%m-%d') birthday,
+		t.phone,
+		t.location,
+		DATE_FORMAT(t.last_modify_time,'%Y-%m-%d %H:%i:%s') last_modify_time
+		FROM member t
+		WHERE t.member_id=#{member_id}
+	</select>
+
+	<!-- 查询会员编号数量 -->
+	<select id="countByMemberId" parameterType="String" resultType="Integer">
+		SELECT count(1)
+		FROM member t
+		WHERE t.member_id = #{_parameter}
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update" parameterType="com.project.backMng.admin.member.model.MemberBean">
+		UPDATE member
+		SET
+		name=#{name} ,
+		sex=#{sex} ,
+		birthday=#{birthday},
+		phone=#{phone},
+		location=#{location},
+		last_modify_time = now()
+		WHERE member_id=#{memberId}
+	</update>
+
+	<!-- 删除会员信息 <update id="deleteMember" parameterType="String"> UPDATE member 
+		SET DELETE_FLAG = 1 WHERE member_id = #{member_id} </update> -->
+
+	<!-- 删除会员信息 -->
+	<delete id="deleteMember" parameterType="String">
+		delete from member where member_id = #{_parameter}
+	</delete>
+	
+    <!-- 增加会员 -->
+	<insert id="insertMember" parameterType="objectMap">
+		INSERT INTO member(member_id, name, sex, birthday, phone,
+		location,delete_flag,last_modify_time)
+		VALUES (#{member_id}, #{name},
+		#{sex}, #{birthday}, #{phone},
+		#{location},#{delete_flag},#{last_modify_time})
+	</insert>
+
+	<!-- 查询是否存在该会员 -->
+	<select id="findCountByMemberId" parameterType="String"
+		resultType="Integer">
+		SELECT
+		count(1)
+		FROM member t
+		WHERE t.member_id=#{_parameter}
+	</select>
+</mapper>

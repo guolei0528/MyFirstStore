@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+						http://www.springframework.org/schema/jdbc
+						http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-4.3.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+        
+<bean id="areaInfoMngAction" class="com.project.backMng.platuser.sys.AreaInfoMng.action.AreaInfoMngAction" scope="prototype">
+    	<property name="areaInfoMngService" ref="areaInfoMngService"></property>
+    </bean>
+    
+    <bean id="areaInfoMngService" class="com.project.backMng.platuser.sys.AreaInfoMng.service.AreaInfoMngServiceImpl" parent="baseService">
+    </bean>
+
+
+<bean id="parkInfoMngAction" class="com.project.backMng.platuser.sys.ParkInfoMng.action.ParkInfoMngAction" scope="prototype">
+    	<property name="parkInfoMngService" ref="parkInfoMngService"></property>
+    	<property name="areaInfoMngService" ref="areaInfoMngService"></property>
+    	<property name="laneInfoMngService" ref="laneInfoMngService"></property>
+    </bean>
+    
+    <bean id="parkInfoMngService" class="com.project.backMng.platuser.sys.ParkInfoMng.service.ParkInfoMngServiceImpl" parent="baseService">
+    </bean>
+
+
+<bean id="laneInfoMngAction" class="com.project.backMng.platuser.sys.LaneInfoMng.action.LaneInfoMngAction" scope="prototype">
+    	<property name="laneInfoMngService" ref="laneInfoMngService"></property>
+    	<property name="areaInfoMngService" ref="areaInfoMngService"></property>
+    </bean>
+    
+    <bean id="laneInfoMngService" class="com.project.backMng.platuser.sys.LaneInfoMng.service.LaneInfoMngServiceImpl" parent="baseService">
+    </bean>
+
+
+
+
+
+<bean id="paymentMngAction" class="com.project.backMng.platuser.finance.PaymentMng.action.PaymentMngAction" scope="prototype">
+    	<property name="paymentMngService" ref="paymentMngService"></property>
+    </bean>
+    
+    <bean id="paymentMngService" class="com.project.backMng.platuser.finance.PaymentMng.service.PaymentMngServiceImpl" parent="baseService">
+    </bean>
+
+<bean id="cashRemitMngAction" class="com.project.backMng.platuser.finance.CashRemitMng.action.CashRemitMngAction" scope="prototype">
+    	<property name="cashRemitMngService" ref="cashRemitMngService"></property>
+    </bean>
+    
+    <bean id="cashRemitMngService" class="com.project.backMng.platuser.finance.CashRemitMng.service.CashRemitMngServiceImpl" parent="baseService">
+    </bean>
+
+
+<bean id="careTrafficRecordMngAction" class="com.project.backMng.platuser.CareTrafficRecordMng.action.CareTrafficRecordMngAction" scope="prototype">
+    	<property name="careTrafficRecordMngService" ref="careTrafficRecordMngService"></property>
+    </bean>
+    
+    <bean id="careTrafficRecordMngService" class="com.project.backMng.platuser.CareTrafficRecordMng.service.CareTrafficRecordMngServiceImpl" parent="baseService">
+    </bean>
+
+
+<bean id="invoiceInfoMngAction" class="com.project.backMng.platuser.finance.InvoiceInfoMng.action.InvoiceInfoMngAction" scope="prototype">
+    	<property name="invoiceInfoMngService" ref="invoiceInfoMngService"></property>
+    </bean>
+    
+    <bean id="invoiceInfoMngService" class="com.project.backMng.platuser.finance.InvoiceInfoMng.service.InvoiceInfoMngServiceImpl" parent="baseService">
+    </bean>
+</beans>

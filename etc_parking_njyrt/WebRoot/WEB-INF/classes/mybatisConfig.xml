@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="logImpl" value="LOG4J2" />
+	</settings>
+	<typeAliases>
+		<typeAlias alias="objectMap" type="com.redoak.jar.base.model.ObjectMap" />
+
+		<typeAlias alias="omap" type="com.redoak.jar.base.model.ObjectMap" />
+
+		<!-- <typeAlias alias="userBean" type="com.redoak.jar.base.model.SysLoginUserBean"/> -->
+
+		<typeAlias alias="userBean"
+			type="com.project.backMng.admin.sys.model.UserBean" />
+
+		<typeAlias alias="loginUserBean"
+			type="com.project.sys.admin.login.model.LoginUserBean" />
+
+		<typeAlias alias="memberBean"
+			type="com.project.backMng.admin.member.model.MemberBean" />
+
+		<typeAlias alias="treeModel" type="com.redoak.jar.base.model.OakTreeModel" />
+
+		<typeAlias alias="meberSaleInfoBean"
+			type="com.project.backCharge.tempCharge.model.MemberSaleInfoBean" />
+
+		<typeAlias alias="chargeRuleCostBean"
+			type="com.project.backCharge.tempCharge.model.ChargeRuleCostBean" />
+
+		<typeAlias alias="tempCostBean"
+			type="com.project.backCharge.tempCharge.model.TempCostBean" />
+
+		<typeAlias alias="whiteListBean"
+			type="com.project.backCharge.tempCharge.model.WhiteListBean" />
+
+		<typeAlias alias="carInfoBean"
+			type="com.project.backMng.admin.member.model.CarInfoBean" />
+
+		<typeAlias alias="communicationCarInfoBean"
+			type="com.project.communication.model.CommunicationCarInfoBean" />
+
+		<typeAlias alias="memberSaleBean"
+			type="com.project.backMng.admin.member.model.MemberSaleBean" />
+
+		<typeAlias alias="flowReportTempBean"
+			type="com.project.backMng.admin.report.model.FlowReportTempBean" />
+
+		<typeAlias alias="incomeReportTempBean"
+			type="com.project.backMng.admin.report.model.IncomeReportTempBean" />
+			
+		<typeAlias alias="flowIncomeReportTempBean"
+			type="com.project.backMng.admin.report.model.FlowIncomeReportTempBean" />
+
+
+	</typeAliases>
+	<mappers>
+		<mapper resource="com/project/sys/admin/login/service/sql/login.xml" />
+
+		<mapper resource="com/project/sys/admin/init/start/sql/InitStart.xml" />
+
+		<!-- <mapper resource="com/project/backMng/admin/sys/service/sql/PlatUserMng.xml"/> -->
+		<mapper resource="com/project/backMng/admin/sys/service/sql/UserMng.xml" />
+
+		<mapper resource="com/project/backMng/pub/sys/service/sql/RoleMng.xml" />
+
+		<mapper resource="com/project/backMng/admin/member/service/sql/MemberMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/member/service/sql/MemberSaleMng.xml" />
+
+
+		<mapper
+			resource="com/project/backMng/platuser/sys/AreaInfoMng/service/sql/AreaInfoMng.xml" />
+		<mapper
+			resource="com/project/backMng/platuser/sys/ParkInfoMng/service/sql/ParkInfoMng.xml" />
+		<mapper
+			resource="com/project/backMng/platuser/sys/LaneInfoMng/service/sql/LaneInfoMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/ChargeRuleMng/service/sql/ChargeRuleMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/voidCard/ParkVoidCardMng/service/sql/ParkVoidCardMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/voidCard/EtcVoidCardMng/service/sql/EtcVoidCardMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/voidCard/EtcBlackListMng/service/sql/EtcBlackListMng.xml" />
+		<mapper
+			resource="com/project/communication/service/sql/CommunicationCarInfo.xml" />
+		<mapper
+			resource="com/project/communication/service/sql/CommunicationOrderCar.xml" />
+		<mapper
+			resource="com/project/communication/service/sql/CommunicationParkPlace.xml" />
+		<mapper
+			resource="com/project/communication/service/sql/CommunicationTempCost.xml" />
+
+		<mapper
+			resource="com/project/backMng/admin/voidCard/ParkVoidCardMng/service/sql/ParkVoidCardMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/voidCard/ParkVoidCardMng/service/sql/ParkVoidCardMng.xml" />
+		<mapper resource="com/project/backMng/admin/member/service/sql/CarInfoMng.xml" />
+		<mapper resource="com/project/backMng/admin/report/service/sql/FlowIncomeReport.xml" />
+		<mapper resource="com/project/backMng/admin/report/service/sql/FlowReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/IncomeReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/PaymentStatement.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/CenterPayReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/EntryReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/ExitAndTrmlReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/ETCReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/CashReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/MobileReport.xml" />
+		<mapper
+			resource="com/project/backMng/admin/report/service/sql/OrderCarReport.xml" />
+		<mapper
+			resource="com/project/backCharge/tempCharge/service/sql/ChargeTempCost.xml" />
+		<mapper
+			resource="com/project/backCharge/tempCharge/service/sql/ChargeEntry.xml" />
+		<mapper
+			resource="com/project/backCharge/tempCharge/service/sql/ChargeRules.xml" />
+		<mapper
+			resource="com/project/backCharge/tempCharge/service/sql/ChargeMemberSaleInfo.xml" />
+		<mapper
+			resource="com/project/backCharge/tempCharge/service/sql/ChargeWhiteList.xml" />
+		<mapper
+			resource="com/project/backMng/admin/voidCard/PoliceVoidCardMng/service/sql/PoliceVoidCardMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/voidCard/TxbVoidCardMng/service/sql/TxbVoidCardMng.xml" />
+
+		<mapper
+			resource="com/project/backMng/admin/transitRecord/EntryMng/service/sql/EntryMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/transitRecord/ExitMng/service/sql/ExitMng.xml" />
+		<mapper
+			resource="com/project/backMng/admin/transitRecord/CompreSearch/service/sql/CompreSearch.xml" />
+		<mapper
+			resource="com/project/backMng/platuser/finance/PaymentMng/service/sql/PaymentMng.xml" />
+		<mapper
+			resource="com/project/backMng/platuser/finance/CashRemitMng/service/sql/CashRemitMng.xml" />
+		<mapper
+			resource="com/project/backMng/platuser/CareTrafficRecordMng/service/sql/CareTrafficRecordMng.xml" />
+		<mapper
+			resource="com/project/backMng/platuser/finance/InvoiceInfoMng/service/sql/InvoiceInfoMng.xml" />
+
+		<mapper resource="com/project/communication/service/sql/TrafficRecord.xml" />
+
+		<mapper
+			resource="com/project/personalCenter/user/service/sql/ModifyPassword.xml" />
+			
+		<mapper resource="com/project/reportForms/service/sql/ExitQuery.xml"/>
+		<mapper resource="com/project/reportForms/service/sql/EntranceQuery.xml"/>
+		<mapper resource="com/project/reportForms/service/sql/TempCost.xml"/>
+
+		<mapper
+			resource="com/project/backMng/admin/whiteListMng/service/sql/WhiteListMng.xml" />
+		<mapper resource="com/project/backMng/admin/coupon/service/sql/IssueBatchMng.xml" />
+		<mapper resource="com/project/backMng/admin/coupon/service/sql/CouponMng.xml" />
+		<mapper 
+			resource="com/project/backMng/admin/whiteListMng/service/sql/WhiteLisParkPlacetMng.xml" />
+	</mappers>
+</configuration>

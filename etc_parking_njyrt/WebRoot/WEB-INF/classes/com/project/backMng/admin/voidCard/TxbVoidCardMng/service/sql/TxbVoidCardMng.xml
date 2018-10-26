@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.voidCard.TxbVoidCardMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM txb_void_card t
+		 WHERE 1=1
+		   <if test="query_in_time_from!=null and query_in_time_from!=''">
+		 	and t.in_time<![CDATA[>=]]>#{query_in_time_from}
+		 </if>
+		 <if test="query_in_time_to!=null and query_in_time_to!=''">
+		 	and t.in_time<![CDATA[<=]]>#{query_in_time_to}
+		 </if>
+		 <if test="query_cancel_time_from!=null and query_cancel_time_from!=''">
+		 	and t.cancel_time<![CDATA[>=]]>#{query_cancel_time_from}
+		 </if>
+		 <if test="query_cancel_time_to!=null and query_cancel_time_to!=''">
+		 	and t.cancel_time<![CDATA[<=]]>#{query_cancel_time_to}
+		 </if>
+		 <if test="query_mv_license!=null and query_mv_license!=''">
+		 	and t.mv_license like CONCAT('%',#{query_mv_license},'%')
+		 </if>
+		 <if test="query_b_list_type!=null and query_b_list_type!=''">
+		 	and t.b_list_type=#{query_b_list_type}
+		 </if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.admin.voidCard.TxbVoidCardMng.model.TxbVoidCardBean">
+    	SELECT 
+			t.mv_license,
+			t.in_time,
+			t.cancel_time,
+			t.b_list_type,
+			t.plate_color,
+			t.park_id,
+			t.user_id,
+			t.spare1,
+			t.spare2,
+			t.plate_color,
+			t.spare3,
+			t.spare4
+		  FROM txb_void_card t
+		 WHERE 1=1
+		   <if test="query_in_time_from!=null and query_in_time_from!=''">
+		 	and t.in_time<![CDATA[>=]]>#{query_in_time_from}
+		 </if>
+		 <if test="query_in_time_to!=null and query_in_time_to!=''">
+		 	and t.in_time<![CDATA[<=]]>#{query_in_time_to}
+		 </if>
+		 <if test="query_cancel_time_from!=null and query_cancel_time_from!=''">
+		 	and t.cancel_time<![CDATA[>=]]>#{query_cancel_time_from}
+		 </if>
+		 <if test="query_cancel_time_to!=null and query_cancel_time_to!=''">
+		 	and t.cancel_time<![CDATA[<=]]>#{query_cancel_time_to}
+		 </if>
+		 <if test="query_mv_license!=null and query_mv_license!=''">
+		 	and t.mv_license like CONCAT('%',#{query_mv_license},'%')
+		 </if>
+		 <if test="query_b_list_type!=null and query_b_list_type!=''">
+		 	and t.b_list_type=#{query_b_list_type}
+		 </if>
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.admin.voidCard.TxbVoidCardMng.model.TxbVoidCardBean">
+    	INSERT INTO txb_void_card(
+				mv_license,
+				in_time,
+				cancel_time,
+				b_list_type,
+				plate_color,
+				park_id,
+				user_id,
+				spare1,
+				spare2,
+			
+				spare3,
+				spare4
+				)
+		VALUES(
+				#{mv_license} ,
+				now() ,
+				#{cancel_time} ,
+				#{b_list_type} ,
+				#{plate_color},
+				#{park_id} ,
+				#{user_id} ,
+				#{spare1} ,
+				#{spare2} ,
+			
+				#{spare3} ,
+				#{spare4} 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="objectMap" resultType="com.project.backMng.admin.voidCard.TxbVoidCardMng.model.TxbVoidCardBean">
+        SELECT 
+			t.mv_license,
+			t.in_time,
+			t.cancel_time,
+			t.b_list_type,
+			t.plate_color,
+			t.park_id,
+			t.user_id,
+			t.spare1,
+			t.spare2,
+				
+			t.spare3,
+			t.spare4,
+			p.park_name
+		  FROM txb_void_card t
+		  left join park_info p
+		  on p.park_id=t.park_id
+        WHERE t.mv_license=#{mv_license}
+        and t.plate_color=#{plate_color}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.admin.voidCard.TxbVoidCardMng.model.TxbVoidCardBean">
+		UPDATE txb_void_card
+		SET 
+			mv_license=#{mv_license} ,
+			cancel_time=#{cancel_time} ,
+			b_list_type=#{b_list_type} ,
+			plate_color=#{plate_color},
+			park_id=#{park_id} ,
+			user_id=#{user_id} ,
+			spare1=#{spare1} ,
+			spare2=#{spare2} ,
+			
+			spare3=#{spare3} ,
+			spare4=#{spare4} 
+		WHERE mv_license=#{mv_license}
+		and 
+		plate_color=#{plate_color}
+    </update>
+	
+    <update id="delete" parameterType="objectMap">
+    	delete from txb_void_card
+		 WHERE mv_license = #{mv_license}
+		 and 
+		 plate_color=#{plate_color}
+    </update>
+    
+      <select id="synchronizeList" parameterType="objectMap" resultType="String">
+    	SELECT 
+			CONCAT(t.mv_license,'|',t.plate_color)
+		  FROM txb_void_card t
+		 limit #{skipSize},#{pageSize}
+    </select>
+    
+    <select id="findTxbVoidByPageSkipSize" parameterType="objectMap" resultType="com.project.backMng.admin.voidCard.TxbVoidCardMng.model.TxbVoidCardBean">
+    	SELECT 
+			t.mv_license,
+			t.plate_color,
+			t.in_time,
+			t.cancel_time,
+			t.b_list_type,
+			t.park_id,
+			t.user_id,
+			t.spare1,
+			t.spare2,
+			t.spare3,
+			t.spare4,
+			t.s_comment
+		  FROM txb_void_card t
+		 limit #{skipSize},#{pageSize}
+    </select>
+    
+    
+        <select id="findParkList" resultType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+    	SELECT 
+			t.park_id,
+			t.park_name,
+			t.park_address,
+			t.spare1,
+				
+			t.spare2,
+			t.spare3,
+			t.spare4,
+			t.s_comment
+				
+		  FROM park_info t
+			WHERE delete_flag=0
+			and park_id!='0'
+    </select>
+</mapper>

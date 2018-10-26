@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.transitRecord.ExitMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM cur_exit
+		WHERE 1=1
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and entrytime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_exit_time_from!=null and query_exit_time_from!=''">
+			and exittime <![CDATA[>=]]>
+			#{query_exit_time_from}
+		</if>
+		<if test="query_exit_time_to!=null and query_exit_time_to!=''">
+			and exittime <![CDATA[<=]]>
+			#{query_exit_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and exitlane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		and recordtype=3
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.ExitMng.model.ExitBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		lane.park_id parkid,
+		lane.area_id areaid,
+		p.park_name park_name,
+		a.area_name area_name,
+		t.entrystation,
+		t.entrylane,
+		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		t.exitdate,
+		t.imagepath,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		t.exitshift,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d %H:%i:%s')programstarttime,
+		DATE_FORMAT(t.exittime,'%Y-%m-%d %H:%i:%s')exittime,
+		CAST((t.pdiscounttoll/100)AS decimal(20,2)) as pdiscounttoll,
+		CAST((t.totaltoll/100)AS decimal(20,2)) as totaltoll,
+		t.exitlane,
+		t.exitoperator
+		FROM cur_exit t
+		left join lane_info lane on lane.lane_id = t.exitlane
+		left join park_info p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id = a.area_id
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and entrytime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and entrytime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_exit_time_from!=null and query_exit_time_from!=''">
+			and exittime <![CDATA[>=]]>
+			#{query_exit_time_from}
+		</if>
+		<if test="query_exit_time_to!=null and query_exit_time_to!=''">
+			and exittime <![CDATA[<=]]>
+			#{query_exit_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and exitlane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		order by exittime desc
+		limit #{skipSize},#{pageSize}
+	</select>
+
+
+	<insert id="insert"
+		parameterType="com.project.backMng.admin.transitRecord.ExitMng.model.ExitBean">
+		INSERT INTO cur_exit(
+		recordno,
+		cardnetwork,
+		cardid,
+		parkid,
+
+		areaid,
+		entrystation,
+		entrylane,
+		entrytime,
+
+		entryoperator,
+		entryshift,
+		autovlicense,
+		mvlicense,
+
+		imagepath
+		)
+		VALUES(
+		#{recordno} ,
+		#{cardnetwork} ,
+		#{cardid} ,
+		#{parkid} ,
+
+		#{areaid} ,
+		#{entrystation} ,
+		#{entrylane} ,
+		#{entrytime} ,
+
+		#{entryoperator} ,
+		#{entryshift} ,
+		#{autovlicense} ,
+		#{mvlicense} ,
+
+		#{imagepath}
+		)
+	</insert>
+
+	<select id="findInfo" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.ExitMng.model.ExitBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		lane.park_id parkid,
+		lane.area_id areaid,
+		p.park_name park_name,
+		a.area_name area_name,
+		t.entrystation,
+		t.entrylane,
+		t.entrytime,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		t.imagepath,
+		t.exitshift,
+		t.exittime,
+		t.exitdate,
+		t.exitlane,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d %H:%i:%s') as programstarttime,
+		t.exitoperator,
+		CAST((t.totaltoll/100)AS decimal(20,2)) as totaltoll,
+		(t.unpaytoll) as unpaytoll,
+		t.paymethod,
+		t.dealstatus,
+		t.feeversion,
+		t.ecardid,
+		t.ecardtype,
+		t.etctradno,
+		t.edecrerecord,
+		t.etctac,
+		t.etctermtradno,
+		t.etctermcode,
+		t.etcobuid,
+		t.etctradtype,
+		t.packageid,
+		t.ticketid,
+		t.membertype,
+		t.invoiceid,
+		CAST((t.eabalance/100) AS decimal(20,2)) as eabalance,
+		CAST((t.ebbalance/100) AS decimal(20,2)) as ebbalance
+		FROM cur_exit t
+		left join lane_info lane on lane.lane_id = t.entrylane
+		left join park_info p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id = a.area_id
+		WHERE t.exitlane=#{exitlane}
+		and mvlicense=#{mvlicense}
+		and exittime=#{exittime}
+	</select>
+	<select id="findHisInfo" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.ExitMng.model.ExitBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		lane.park_id parkid,
+		lane.area_id areaid,
+		t.entrystation,
+		t.entrylane,
+		t.entrytime,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		t.imagepath,
+		t.exitshift,
+		t.exittime,
+		t.exitlane,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d %H:%i:%s')programstarttime,
+		t.exitoperator,
+		CAST((t.totaltoll/100)AS decimal(20,2))totaltoll,
+		(t.unpaytoll)unpaytoll,
+		t.paymethod,
+		t.dealstatus,
+		t.feeversion,
+		t.ecardid,
+		t.ecardtype,
+		t.etctradno,
+		t.edecrerecord,
+		t.etctac,
+		t.etctermtradno,
+		t.etctermcode,
+		t.etcobuid,
+		t.etctradtype,
+		t.packageid,
+		t.ticketid,
+		t.membertype,
+		t.invoiceid,
+		CAST((t.eabalance/100) AS decimal(20,2))eabalance,
+		CAST((t.ebbalance/100) AS decimal(20,2))ebbalance
+		FROM ${tableName} t,lane_info lane
+		WHERE t.exitlane=#{exitlane}
+		and mvlicense=#{mvlicense}
+		and exittime=#{exittime}
+		and lane.lane_id=t.exitlane
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update"
+		parameterType="com.project.backMng.admin.transitRecord.ExitMng.model.ExitBean">
+		UPDATE cur_exit
+		SET
+		recordno=#{recordno} ,
+		cardnetwork=#{cardnetwork} ,
+		cardid=#{cardid} ,
+		parkid=#{parkid} ,
+
+		areaid=#{areaid} ,
+		entrystation=#{entrystation} ,
+		entrylane=#{entrylane} ,
+		entrytime=#{entrytime} ,
+
+		entryoperator=#{entryoperator} ,
+		entryshift=#{entryshift} ,
+		autovlicense=#{autovlicense} ,
+		mvlicense=#{mvlicense} ,
+
+		imagepath=#{imagepath}
+		WHERE ID=#{ID}
+	</update>
+
+	<select id="findHisCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM ${tableName} t
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and exittime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and exittime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and exitlane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findHisList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.transitRecord.ExitMng.model.ExitBean">
+		SELECT
+		t.recordno,
+		t.cardnetwork,
+		t.cardid,
+		lane.park_id parkid,
+
+		lane.area_id areaid,
+		p.park_name,
+		a.area_name,
+		t.entrystation,
+		t.entrylane,
+		DATE_FORMAT(t.entrytime,'%Y-%m-%d %H:%i:%s')entrytime,
+		t.imagepath,
+		t.entryoperator,
+		t.entryshift,
+		t.autovlicense,
+		t.mvlicense,
+		t.exitshift,
+		t.exitlane,
+		DATE_FORMAT(t.exittime,'%Y-%m-%d %H:%i:%s')exittime,
+		t.exitdate,
+		DATE_FORMAT(t.programstarttime,'%Y-%m-%d')programstarttime,
+		t.exitoperator
+		FROM ${tableName} t
+		left join lane_info lane on lane.lane_id = t.exitlane
+		left join park_info p on p.park_id = lane.park_id
+		left join area_info a on lane.area_id = a.area_id
+		WHERE t.recordtype=3
+		<if test="query_entry_time_from!=null and query_entry_time_from!=''">
+			and exittime <![CDATA[>=]]>
+			#{query_entry_time_from}
+		</if>
+		<if test="query_entry_time_to!=null and query_entry_time_to!=''">
+			and exittime <![CDATA[<=]]>
+			#{query_entry_time_to}
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense!=''">
+			and mvlicense like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_lane_id!=null and query_lane_id!=''">
+			and exitlane like CONCAT('%',#{query_lane_id},'%')
+		</if>
+		order by exittime desc
+	</select>
+</mapper>

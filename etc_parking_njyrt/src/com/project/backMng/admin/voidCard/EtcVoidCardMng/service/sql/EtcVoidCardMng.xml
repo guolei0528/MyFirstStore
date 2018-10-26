@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.afindCountdmin.voidCard.EtcVoidCardMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM etc_void_card t
+		WHERE 1=1
+		<if test="query_in_time_from!=null and query_in_time_from!=''">
+			and t.intime<![CDATA[>=]]>#{query_in_time_from}
+		</if>
+		<if test="query_in_time_to!=null and query_in_time_to!=''">
+			and t.intime<![CDATA[<=]]>#{query_in_time_to}
+		</if>
+		<if test="query_cancel_time_from!=null and query_cancel_time_from!=''">
+			and t.cancel_time<![CDATA[>=]]>#{query_cancel_time_from}
+		</if>
+		<if test="query_cancel_time_to!=null and query_cancel_time_to!=''">
+			and t.cancel_time<![CDATA[<=]]>#{query_cancel_time_to}
+		</if>
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			and t.ban_type like CONCAT('%',#{query_mv_license},'%')
+		</if>
+		<if test="query_b_list_type!=null and query_b_list_type!=''">
+			and t.ban_type=#{query_b_list_type}
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.voidCard.EtcVoidCardMng.model.EtcVoidCardBean">
+		SELECT
+		t.card_type,
+		t.card_network,
+		t.card_id,
+		t.card_status,
+
+		t.status_type,
+		t.issuer_id,
+		t.electronic_id,
+		t.mv_license,
+
+		t.mv_license_colour,
+		DATE_FORMAT(t.intime,'%Y-%m-%d')intime,
+		DATE_FORMAT(t.cancel_time,'%Y-%m-%d')cancel_time,
+		t.issuer_version,
+
+		t.ban_type,
+		t.issuer_effective_time,
+		t.valid_flag,
+		t.valid_time,
+
+		t.lock_card,
+		t.contact_info,
+		t.s_comment,
+		t.version,
+
+		t.spare1,
+		t.spare2,
+		t.spare3
+		FROM etc_void_card t
+		WHERE 1=1
+		<if test="query_in_time_from!=null and query_in_time_from!=''">
+			and t.intime<![CDATA[>=]]>#{query_in_time_from}
+		</if>
+		<if test="query_in_time_to!=null and query_in_time_to!=''">
+			and t.intime<![CDATA[<=]]>#{query_in_time_to}
+		</if>
+		<if test="query_cancel_time_from!=null and query_cancel_time_from!=''">
+			and t.cancel_time<![CDATA[>=]]>#{query_cancel_time_from}
+		</if>
+		<if test="query_cancel_time_to!=null and query_cancel_time_to!=''">
+			and t.cancel_time<![CDATA[<=]]>#{query_cancel_time_to}
+		</if>
+		<if test="query_mv_license!=null and query_mv_license!=''">
+			and t.ban_type like CONCAT('%',#{query_mv_license},'%')
+		</if>
+		<if test="query_b_list_type!=null and query_b_list_type!=''">
+			and t.ban_type=#{query_b_list_type}
+		</if>
+		order by intime desc
+	</select>
+
+
+	<insert id="insert"
+		parameterType="com.project.backMng.admin.voidCard.EtcVoidCardMng.model.EtcVoidCardBean">
+		INSERT INTO etc_void_card(
+		card_type,
+		card_network,
+		card_id,
+		card_status,
+
+		status_type,
+		issuer_id,
+		electronic_id,
+		mv_license,
+
+		mv_license_colour,
+		intime,
+		cancel_time,
+		issuer_version,
+
+		ban_type,
+		issuer_effective_time,
+		valid_flag,
+		valid_time,
+
+		lock_card,
+		contact_info,
+		s_comment,
+		version,
+
+		spare1,
+		spare2,
+		spare3
+		)
+		VALUES(
+		#{card_type} ,
+		#{card_network} ,
+		#{card_id} ,
+		#{card_status} ,
+
+		#{status_type} ,
+		#{issuer_id} ,
+		#{electronic_id} ,
+		#{mv_license} ,
+
+		#{mv_license_colour} ,
+		#{intime} ,
+		#{cancel_time} ,
+		#{issuer_version} ,
+
+		#{ban_type} ,
+		#{issuer_effective_time} ,
+		#{valid_flag} ,
+		#{valid_time} ,
+
+		#{lock_card} ,
+		#{contact_info} ,
+		#{s_comment} ,
+		#{version} ,
+
+		#{spare1} ,
+		#{spare2} ,
+		#{spare3}
+		)
+	</insert>
+
+	<select id="findInfo" parameterType="String"
+		resultType="com.project.backMng.admin.voidCard.EtcVoidCardMng.model.EtcVoidCardBean">
+		SELECT
+		t.card_type,
+		t.card_network,
+		t.card_id,
+		t.card_status,
+
+		t.status_type,
+		t.issuer_id,
+		t.electronic_id,
+		t.mv_license,
+
+		t.mv_license_colour,
+		DATE_FORMAT(t.intime,'%Y-%m-%d')intime,
+		DATE_FORMAT(t.cancel_time,'%Y-%m-%d')cancel_time,
+		t.issuer_version,
+
+		t.ban_type,
+		t.issuer_effective_time,
+		t.valid_flag,
+		t.valid_time,
+
+		t.lock_card,
+		t.contact_info,
+		t.s_comment,
+		t.version,
+
+		t.spare1,
+		t.spare2,
+		t.spare3
+		FROM etc_void_card t
+		WHERE t.card_network=#{card_network}
+		and t.card_id=#{card_id}
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update"
+		parameterType="com.project.backMng.admin.voidCard.EtcVoidCardMng.model.EtcVoidCardBean">
+		UPDATE etc_void_card
+		SET
+		card_type=#{card_type} ,
+		card_network=#{card_network} ,
+		card_id=#{card_id} ,
+		card_status=#{card_status} ,
+
+		status_type=#{status_type} ,
+		issuer_id=#{issuer_id} ,
+		electronic_id=#{electronic_id} ,
+		mv_license=#{mv_license} ,
+
+		mv_license_colour=#{mv_license_colour} ,
+		intime=#{intime} ,
+		cancel_time=#{cancel_time} ,
+		issuer_version=#{issuer_version} ,
+
+		ban_type=#{ban_type} ,
+		issuer_effective_time=#{issuer_effective_time} ,
+		valid_flag=#{valid_flag} ,
+		valid_time=#{valid_time} ,
+
+		lock_card=#{lock_card} ,
+		contact_info=#{contact_info} ,
+		s_comment=#{s_comment} ,
+		version=#{version} ,
+
+		spare1=#{spare1} ,
+		spare2=#{spare2} ,
+		spare3=#{spare3}
+		WHERE ID=#{ID}
+	</update>
+
+	<update id="delete" parameterType="String">
+		UPDATE etc_void_card
+		SET DELETE_FLAG = 1
+		WHERE ID = #{value}
+	</update>
+
+	<select id="synchronizeList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.voidCard.EtcVoidCardMng.model.EtcVoidCardBean">
+		SELECT
+		t.card_type,
+		t.card_network,
+		t.card_id,
+		t.card_status,
+
+		t.status_type,
+		t.issuer_id,
+		t.electronic_id,
+		t.mv_license,
+
+		t.mv_license_colour,
+		DATE_FORMAT(t.intime,'%Y-%m-%d')intime,
+		DATE_FORMAT(t.cancel_time,'%Y-%m-%d')cancel_time,
+		t.issuer_version,
+
+		t.ban_type,
+		t.issuer_effective_time,
+		t.valid_flag,
+		t.valid_time,
+
+		t.lock_card,
+		t.contact_info,
+		t.s_comment,
+		t.version,
+
+		t.spare1,
+		t.spare2,
+		t.spare3
+		FROM etc_void_card t
+		limit #{skipSize},#{pageSize}
+	</select>
+
+	<select id="findEtcVoidByPageSkipSize" parameterType="objectMap"
+		resultType="com.project.backMng.admin.voidCard.EtcVoidCardMng.model.EtcVoidCardBean">
+		SELECT
+		card_type,
+		card_network,
+		card_id,
+		card_status,
+		status_type,
+		issuer_id,
+		electronic_id,
+		mv_license,
+		mv_license_colour,
+		intime,
+		cancel_time,
+		issuer_version,
+		ban_type,
+		issuer_effective_time,
+		valid_flag,
+		valid_time,
+		lock_card,
+		contact_info,
+		s_comment,
+		version,
+		spare1,
+		spare2,
+		spare3
+		FROM etc_void_card
+		limit #{skipSize},#{pageSize}
+	</select>
+</mapper>

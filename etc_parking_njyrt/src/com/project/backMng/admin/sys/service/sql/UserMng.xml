@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.sys.UserMng">
+	<resultMap id="userResultMap" type="userBean">
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="login_name" jdbcType="VARCHAR" property="loginName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="user_operator" jdbcType="VARCHAR" property="userOperator" />
+    <result column="user_shift" jdbcType="INTEGER" property="userShift" />
+    <result column="operator_shift" jdbcType="INTEGER" property="operatorShift" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="in_use_flag" jdbcType="INTEGER" property="inUseFlag" />
+    <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_modify_time" jdbcType="TIMESTAMP" property="lastModifyTime" />
+    <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+    <result column="spare2" jdbcType="INTEGER" property="spare2" />
+    <result column="spare3" jdbcType="VARCHAR" property="spare3" />
+    <result column="spare4" jdbcType="VARCHAR" property="spare4" />
+    <result column="s_comment" jdbcType="VARCHAR" property="sComment" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    
+	</resultMap>
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM user t
+		 WHERE t.delete_flag=0
+		 <if test="query_login_name!=null and query_login_name!=''">
+				AND t.login_name like CONCAT('%', #{query_login_name}, '%')
+			</if>
+		 <if test="query_name!=null and query_name!=''">
+				AND t.name like CONCAT('%', #{query_name}, '%')
+			</if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultMap="userResultMap">
+    	SELECT 
+    	    t.user_id,
+			t.login_name,
+			t.name,
+			t.sex,
+			t.phone,
+			t.in_use_flag,
+			DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') CREATE_TIME,
+			DATE_FORMAT(t.last_modify_time,'%Y-%m-%d %H:%i:%s') LAST_MODIFY_TIME,
+			r.role_name
+		  FROM user t
+		 left join role r on t.role_id = r.role_id and r.delete_flag=0
+		 WHERE t.delete_flag=0 
+		 <if test="query_login_name!=null and query_login_name!=''">
+				AND t.login_name like CONCAT('%', #{query_login_name}, '%')
+			</if>
+		 <if test="query_name!=null and query_name!=''">
+				AND t.name like CONCAT('%', #{query_name}, '%')
+			</if>
+		ORDER BY t.create_time asc
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.admin.sys.model.PlatUserBean">
+    	INSERT INTO t_plat_user(
+				ID,
+				NAME,
+				SEX,
+				WORK_NO,
+			
+				MOBILE,
+				REMARK,
+				CREATE_TIME,
+				LAST_MODIFY_TIME,
+			
+				IN_USE_FLAG,
+				DELETE_FLAG
+				)
+		VALUES(
+				#{ID} ,
+				#{NAME} ,
+				#{SEX} ,
+				#{WORK_NO} ,
+			
+				#{MOBILE} ,
+				#{REMARK} ,
+				now() ,
+				now() ,
+			
+				#{IN_USE_FLAG} ,
+				#{DELETE_FLAG} 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultMap="userResultMap">
+        SELECT 
+            t.user_id,
+            t.login_name,
+			t.role_id,
+			t.name,
+			t.sex,
+			t.phone,
+			t.user_shift,
+			t.in_use_flag,
+			DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') create_time,
+			DATE_FORMAT(t.last_modify_time,'%Y-%m-%d %H:%i:%s') last_modify_time,
+			t.s_comment,
+			t.area_id,
+			r.role_name
+		  FROM user t
+		  left join role r on t.role_id = r.role_id and r.delete_flag=0
+        WHERE t.user_id=#{user_id}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.admin.sys.model.UserBean">
+		UPDATE user
+		SET 
+			name=#{name} ,
+			sex=#{sex} ,
+			login_name=#{loginName},
+			user_operator=#{loginName} ,
+			phone=#{phone} ,
+			in_use_flag =#{inUseFlag} ,
+			s_comment=#{sComment} ,
+			last_modify_time=now() ,
+			<if test="userShift!=null and userShift!=''">
+				user_shift=#{userShift},
+			</if>
+			<if test="userShift==null or userShift ==''">
+				user_shift= 0,
+			</if>
+			role_id=#{roleId},
+			area_id=#{areaId}
+		WHERE user_id=#{userId}
+    </update>
+    
+<!--     删除用户信息 -->
+    <update id="deleteUser" parameterType="String">
+    	UPDATE user
+		   SET DELETE_FLAG = 1
+		 WHERE user_id = #{user_id}
+    </update>
+    <insert id="insertUser" parameterType="objectMap">
+    	INSERT INTO user(user_id, name,sex,login_name, user_operator, password,phone,user_shift, create_time, last_modify_time,in_use_flag,delete_flag,role_id,s_comment,area_id)
+		VALUES (#{user_id}, #{name}, #{sex}, #{login_name}, #{login_name}, #{password}, #{phone}, #{user_shift},#{create_time}, #{last_modify_time}, #{in_use_flag}, #{delete_flag}, #{role_id},#{s_comment},#{area_id})
+		
+    </insert>
+    
+    <!-- 查询用户员工号个数 -->
+    <select id="checkUniqueWorkID" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM user t
+		 WHERE t.delete_flag=0
+		  <if test="user_id!=null and user_id!=''">
+				AND t.user_id != #{user_id}
+		  </if>
+		 <if test="login_name!=null and login_name!=''">
+				AND t.login_name = #{login_name}
+		  </if>
+    </select>
+    
+</mapper>

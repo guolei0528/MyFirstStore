@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.mobileReport">
+
+	<!-- 查询对账明细数量 -->
+	<select id="findCountReport" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)
+		from statistics_report t 
+		where ((t.lane_type in (1,2,4) and t.operator <![CDATA[<>]]> 0)or (t.lane_type = 0 and t.lane_id =1199  and t.operator = 0))
+		<if test="query_pay_method!=null and query_pay_method == 3">
+		and t.flow_wx_total <![CDATA[<>]]> 0
+		</if>
+		<if test="query_pay_method!=null and query_pay_method == 4">
+		and t.flow_zfb_total <![CDATA[<>]]> 0
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.lane_id = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.operator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=''">
+			and statistics_date <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and statistics_date <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+		order by statistics_date,park_id,area_id,lane_id,operator,shift
+	</select>
+
+
+	<!-- 查询对账明细数据 -->
+	<select id="findReport" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.StatisticsReportBean">
+select park_id,area_id,lane_id,lane_type,statistics_date,operator,shift,${query_pay_method} mpay_type,
+flow_wx_total,toll_wx_total,flow_wx_full,toll_wx_full,flow_wx_coupon,toll_wx_coupon_ea,
+toll_wx_coupon_eb,flow_wx_refund,toll_wx_refund,flow_zfb_total,toll_zfb_total,
+flow_zfb_full,toll_zfb_full,flow_zfb_coupon,toll_zfb_coupon_ea,
+toll_zfb_coupon_eb,flow_zfb_refund,toll_zfb_refund,
+(select park_name from park_info p where t.park_id = p.park_id) park_name,
+(select area_name from area_info a where a.park_id = t.park_id and a.area_id = t.area_id) area_name,
+(select lane_name from lane_info l where l.park_id = t.park_id 
+and l.area_id = t.area_id and l.lane_id = t.lane_id) lane_name,
+(select name from user u where u.login_name = t.operator) operator_name
+from statistics_report t 
+where ((t.lane_type in (1,2,4) and t.operator <![CDATA[<>]]> 0)or (t.lane_type = 0 and t.lane_id =1199  and t.operator = 0))
+		<if test="query_pay_method!=null and query_pay_method == 3">
+		and t.flow_wx_total <![CDATA[<>]]> 0
+		</if>
+		<if test="query_pay_method!=null and query_pay_method == 4">
+		and t.flow_zfb_total <![CDATA[<>]]> 0
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.lane_id = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.operator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=''">
+			and statistics_date <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and statistics_date <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+order by statistics_date,park_id,area_id,lane_id,operator,shift
+	</select>
+	
+	
+	<!-- 查询数据列表 -->
+	<select id="findExitDetialList" resultType="objectMap" parameterType="objectMap">
+		select t.mvlicense,t.exitdate,t.exitlane,t.entrytime,t.exittime,
+		(select lane_name from lane_info l where l.park_id = t.exitstation
+		and l.lane_id = t.exitlane) lanename,
+		t.exitoperator,
+		(select name from user u where u.login_name = t.exitoperator) operatorname,
+		t.paymethod,t.pdiscounttoll,t.totaltoll
+		from cur_exit t where
+		t.recordtype = 3
+		and paymethod in (3,4)
+		<if test="query_pay_method!=null and query_pay_method !=''">
+			and paymethod = #{query_pay_method}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and exitlane = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and exitoperator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=null!=''">
+			and exitdate <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and exitdate <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+		order by exitdate asc
+	</select>
+	
+	<select id="findCenterDetialList" resultType="objectMap" parameterType="objectMap">
+		select t.mvlicense,t.terminaldate,t.terminalid,t.entrytime,t.terminaltime,
+		(select lane_name from lane_info l where l.park_id = t.terminalstation
+		and l.lane_id = t.terminalid) lanename,
+		t.terminaloperator,
+		(select name from user u where u.login_name = t.terminaloperator) operatorname,
+		t.paymethod,t.pdiscounttoll,t.totaltoll
+		from cur_centerpay t where
+		t.recordtype = 3
+		and paymethod in (3,4)
+		<if test="query_pay_method!=null and query_pay_method !=''">
+			and paymethod = #{query_pay_method}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and terminalid = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and terminaloperator = #{query_operator}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=null!=''">
+			and terminaldate <![CDATA[>=]]>
+			#{query_statistics_date_from}
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and terminaldate <![CDATA[<=]]>
+			#{query_statistics_date_to}
+		</if>
+		order by terminaldate asc
+	</select>
+	
+	
+	
+	<select id="findMobileDetialList" resultType="objectMap" parameterType="objectMap">
+		select t.mv_license,DATE_FORMAT(pay_time,"%Y%m%d") pay_date,
+		t.entry_time,t.pay_time,
+		(select lane_name from lane_info l where l.park_id = t.park_id
+		and l.area_id = t.area_id
+		and l.lane_id = t.entry_time) lanename,
+		t.pay_method,t.pay_bill
+		from order_car t where
+		pay_method in (3,4)
+		<!-- <if test="query_operator!=null and query_operator =='1199'">
+			and 1 = 1
+		</if>
+		<if test="query_operator==null or query_operator !='1199'">
+			and 1 = 2
+		</if> -->
+		<if test="query_pay_method!=null and query_pay_method !=''">
+			and pay_method = #{query_pay_method}
+		</if>
+		<if
+			test="query_statistics_date_from!=null and query_statistics_date_from!=null!=''">
+			and DATE_FORMAT(pay_time,"%Y%m%d")  <![CDATA[>=]]>
+			DATE_FORMAT(#{query_statistics_date_from},"%Y%m%d")
+		</if>
+		<if test="query_statistics_date_to!=null and query_statistics_date_to!=''">
+			and DATE_FORMAT(pay_time,"%Y%m%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_statistics_date_to},"%Y%m%d")
+		</if>
+		order by pay_time asc
+	</select>
+	
+	
+	<!-- 查询数据列表 -->
+	<select id="queryLaneList" resultType="objectMap">
+		SELECT
+		lane_id,
+		lane_name
+		FROM lane_info
+		WHERE delete_flag=0
+		and lane_flag in (2,3)
+	</select>
+
+
+	<!-- 查询数据列表 -->
+	<select id="queryUserList" resultType="objectMap">
+		SELECT
+		login_name,
+		name
+		FROM user
+		WHERE delete_flag=0
+		and role_id in (4,5)
+	</select>
+	
+	
+	<!-- 查询数据列表 -->
+	<select id="queryLaneType" resultType="Integer" parameterType="objectMap">
+		SELECT
+		lane_flag
+		FROM lane_info
+		WHERE 
+		park_id = #{query_park_id}
+		and area_id = #{query_area_id}
+		and lane_id= #{query_lane_id}
+	</select>
+	
+	
+	
+<!-- 查询出口数量 -->
+	<select id="findCountExitList" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)
+		from cur_exit t where
+		t.recordtype = 3
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.exitstation = #{query_park_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.exitlane = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.exitoperator = #{query_operator}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and t.exitdate = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==0">
+			and t.pdiscounttoll <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==1">
+			and t.pdiscounttoll = t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==2">
+			and t.pdiscounttoll <![CDATA[<>]]> t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==3">
+			and t.pdiscounttoll <![CDATA[<]]> 0
+		</if>
+	</select>
+	
+	
+	
+<!-- 查询出口数量 -->
+	<select id="findExitList" parameterType="objectMap"
+		resultType="objectMap">
+		select t.mvlicense,t.exitdate date,t.exitlane,t.exittime time,
+		(select lane_name from lane_info l where l.park_id = t.exitstation
+		and l.lane_id = t.exitlane) lanename,
+		t.exitoperator,
+		(select name from user u where u.login_name = t.exitoperator) operatorname,
+		t.paymethod,t.pdiscounttoll,t.totaltoll
+		from cur_exit t where
+		t.recordtype = 3
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.exitstation = #{query_park_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.exitlane = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.exitoperator = #{query_operator}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and t.exitdate = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==0">
+			and t.pdiscounttoll <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==1">
+			and t.pdiscounttoll = t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==2">
+			and t.pdiscounttoll <![CDATA[<>]]> t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==3">
+			and t.pdiscounttoll <![CDATA[<]]> 0
+		</if>
+	</select>
+
+
+
+
+<!-- 查询出口数量 -->
+	<select id="findCountCenterList" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)
+		from cur_centerpay t where
+		t.recordtype = 3
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.terminalstation = #{query_park_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.terminalid = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.terminaloperator = #{query_operator}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and t.terminaldate = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==0">
+			and t.pdiscounttoll <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==1">
+			and t.pdiscounttoll = t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==2">
+			and t.pdiscounttoll <![CDATA[<>]]> t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==3">
+			and t.pdiscounttoll <![CDATA[<]]> 0
+		</if>
+	</select>
+	
+	
+	
+	<!-- 查询出口数量 -->
+	<select id="findCenterList" parameterType="objectMap"
+		resultType="objectMap">
+		select t.mvlicense,t.terminaldate date,t.terminalid,t.terminaltime time,
+		(select lane_name from lane_info l where l.park_id = t.terminalstation
+		and l.lane_id = t.terminalid) lanename,
+		t.terminaloperator,
+		(select name from user u where u.login_name = t.terminaloperator) operatorname,
+		t.paymethod,t.pdiscounttoll,t.totaltoll
+		from cur_centerpay t where t.recordtype = 3
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.terminalstation = #{query_park_id}
+		</if>
+		<if test="query_lane_id!=null and query_lane_id !=''">
+			and t.terminalid = #{query_lane_id}
+		</if>
+		<if test="query_operator!=null and query_operator !=''">
+			and t.terminaloperator = #{query_operator}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and t.terminaldate = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.paymethod = #{query_pay_method}
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==0">
+			and t.pdiscounttoll <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==1">
+			and t.pdiscounttoll = t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==2">
+			and t.pdiscounttoll <![CDATA[<>]]> t.totaltoll
+			and t.pdiscounttoll > 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==3">
+			and t.pdiscounttoll <![CDATA[<]]> 0
+		</if>
+	</select>
+	
+	
+	<select id="findCountOrderDetialList" resultType="Integer" parameterType="objectMap">
+		select count(1)
+		from order_car t where
+		pay_method in (3,4)
+		<!-- <if test="query_operator!=null and query_operator =='1199'">
+			and 1 = 1
+		</if>
+		<if test="query_operator==null or query_operator !='1199'">
+			and 1 = 2
+		</if> -->
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.park_id = #{query_park_id}
+		</if>
+		<if test="query_area_id!=null and query_area_id !=''">
+			and t.area_id = #{query_area_id}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and DATE_FORMAT(pay_time,"%Y%m%d") = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.pay_method = #{query_pay_method}
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==0">
+			and t.pay_bill <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==1">
+			and t.pay_bill <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==2">
+			and 1=2
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==3">
+			and 1=2
+		</if>
+		order by pay_time asc
+	</select>
+	
+	
+	<select id="findOrderDetialList" resultType="objectMap" parameterType="objectMap">
+		select t.mv_license mvlicense,DATE_FORMAT(pay_time,"%Y%m%d") date,
+		t.entry_time,t.pay_time time,
+		'预约支付' lanename,
+		t.pay_method paymethod,t.pay_bill pdiscounttoll,t.pay_bill totaltoll
+		from order_car t where
+		pay_method in (3,4)
+		<!-- <if test="query_operator!=null and query_operator =='1199'">
+			and 1 = 1
+		</if>
+		<if test="query_operator==null or query_operator !='1199'">
+			and 1 = 2
+		</if> -->
+		<if test="query_park_id!=null and query_park_id !=''">
+			and t.park_id = #{query_park_id}
+		</if>
+		<if test="query_area_id!=null and query_area_id !=''">
+			and t.area_id = #{query_area_id}
+		</if>
+		<if test="query_date!=null and query_date!=''">
+			and DATE_FORMAT(pay_time,"%Y%m%d") = #{query_date}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.pay_method = #{query_pay_method}
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==0">
+			and t.pay_bill <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==1">
+			and t.pay_bill <![CDATA[<>]]> 0
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==2">
+			and 1=2
+		</if>
+		<if test="query_flow_type!=null and query_flow_type==3">
+			and 1=2
+		</if>
+		order by pay_time asc
+	</select>
+	
+	
+</mapper>

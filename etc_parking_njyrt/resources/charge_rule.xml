@@ -1,0 +1,1221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chargeRules>
+	<vaild>
+		<vaildType>1</vaildType>
+		<vaildType>2</vaildType>
+		<vaildType>3</vaildType>
+		<!-- 特殊计费:省人民医院享受特殊优惠 -->
+		<vaildType>4</vaildType>
+	</vaild>
+	
+	
+	<chargeRule type="1">
+		<setting>
+			<!--计费id -->
+			<id>11</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>30</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>1440</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>1000</maxToll> -->
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>备注</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>15</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>3600</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>3600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>50</smallToll>
+			<!--大车单价 -->
+			<largeToll>50</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>600</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>100</smallToll>
+			<!--大车单价 -->
+			<largeToll>100</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+
+	<chargeRule type="1">
+		<setting>
+			<!--计费id -->
+			<id>12</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>15</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>0</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>0</maxToll> -->
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>备注</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>15</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>0</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>3600</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>3600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>200</smallToll>
+			<!--大车单价 -->
+			<largeToll>200</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额--> 
+			<limitType>0</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>600</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>100</smallToll>
+			<!--大车单价 -->
+			<largeToll>100</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+	
+
+	<chargeRule type="1">
+		<setting>
+			<!--计费id -->
+			<id>13</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>15</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>1440</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>1000</maxToll> -->
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>备注</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>15</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>3600</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>3600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>150</smallToll>
+			<!--大车单价 -->
+			<largeToll>150</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>600</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>100</smallToll>
+			<!--大车单价 -->
+			<largeToll>100</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+
+	<chargeRule type="1">
+		<setting>
+			<!--计费id -->
+			<id>14</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>0</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>1440</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>1000</maxToll> -->
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>备注</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>15</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>3600</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>3600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>150</smallToll>
+			<!--大车单价 -->
+			<largeToll>150</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>600</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>100</smallToll>
+			<!--大车单价 -->
+			<largeToll>100</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+	
+	
+<!-- 	扬子江隧道 -->
+	<chargeRule type="1">
+		<setting>
+			<!--计费id -->
+			<id>15</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>15</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>0</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>0</maxToll> -->
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>扬子江隧道</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>15</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>3600</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>3600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>100</smallToll>
+			<!--大车单价 -->
+			<largeToll>200</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额--> 
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>600</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>100</smallToll>
+			<!--大车单价 -->
+			<largeToll>150</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+	
+	
+	
+	
+<!--  苏州大学内部计费 -->
+	<chargeRule type="1">
+		<setting>
+			<!--计费id -->
+			<id>16</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>3</num>
+			<!--免费时间 -->
+			<freeTime>0</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>0</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>0</maxToll> -->
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>苏州大学内部计费</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>06:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>01:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>2</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>0</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>0</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>0</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>0</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>0</smallToll>
+			<!--大车单价 -->
+			<largeToll>0</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>01:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额--> 
+			<limitType>2</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>600</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>1200</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>600</smallToll>
+			<!--大车单价 -->
+			<largeToll>1200</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>02:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>06:00:00</endTime>
+			<!--计费周期 -->
+			<period>30</period>
+			<!--最大上限类型 1.时间，2.金额--> 
+			<limitType>2</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>200</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>4000</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>200</smallToll>
+			<!--大车单价 -->
+			<largeToll>400</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+
+<!--时间长度收费模式-->
+
+<!-- 苏州大学外来车辆收费 -->
+  <chargeRule type ="2">
+    <setting>
+      <!--计费id -->
+	  <id>22</id>
+      <!--计费类型-->
+      <type>2</type>
+      <!--节点个数-->
+      <num>2</num>
+      <!--免费时间（分）-->
+      <freeTime>0</freeTime> 
+      <!-- 是否零点重置0不重置  1重置 -->
+      <reset>1</reset>
+      <!--启用涟水模式 出口在免费时间段收费为0  1启用  0不启用  2时段内不收费--> 
+      <useFreeTime>0</useFreeTime>
+      <!--免费时间段开始时间-->
+      <freeStartTime>23:30:00</freeStartTime>
+      <!--免费时间段结束时间-->
+      <freeEndTime>06:00:00</freeEndTime>
+      <!--最大周期时长-->
+      <maxCycle>1440</maxCycle>
+      <!--最大周期上限金额-->
+      <!--小车 -->
+      <smallMaxToll>2000</smallMaxToll>
+      <!--大车 -->
+      <largeMaxToll>4000</largeMaxToll>
+      <!--超过最大收费周期计算规则 1-重复计算 2-累计计算-->
+      <beyoneChargeFlag>2</beyoneChargeFlag>
+      <!--版本-->
+      <version>20170903</version>
+      <!--备注-->
+      <sComment></sComment>
+    </setting> 
+
+    <node1>
+      <!--时间长度-->
+      <startLong>60</startLong>
+      <!--计费周期-->
+      <period>60</period>
+      <!--限价-->
+      <limitToll>0</limitToll>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node1>
+
+    <node2>
+      <!--时间长度-->
+      <startLong>60</startLong>
+      <!--计费周期-->
+      <period>60</period>
+      <!--限价-->
+      <limitToll>1200</limitToll>
+      <!--小车单价-->
+      <smallToll>600</smallToll>
+      <!--大车单价-->
+      <largeToll>1200</largeToll>
+    </node2>
+
+    <node3>
+      <!--时间长度-->
+      <startLong>30</startLong>
+      <!--计费周期-->
+      <period>30</period>
+      <!--限价-->
+      <limitToll>400</limitToll>
+      <!--小车单价-->
+      <smallToll>200</smallToll>
+      <!--大车单价-->
+      <largeToll>400</largeToll>
+    </node3>
+
+    <node4>
+      <!--时间长度-->
+      <startLong>0</startLong>
+      <!--计费周期-->
+      <period>0</period>
+      <!--限价-->
+      <limitToll>0</limitToll>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node4>
+
+    <node5>
+      <!--时间长度-->
+      <startLong>0</startLong>
+      <!--计费周期-->
+      <period>0</period>
+      <!--限价-->
+      <limitToll>0</limitToll>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node5>
+  </chargeRule>
+  
+<!-- 苏州城区 -->
+  <chargeRule type ="2">
+    <setting>
+      <!--计费id -->
+	  <id>26</id>
+      <!--计费类型-->
+      <type>2</type>
+      <!--节点个数-->
+      <num>2</num>
+      <!--免费时间（分）-->
+      <freeTime>30</freeTime> 
+      <!-- 是否零点重置0不重置  1重置 -->
+      <reset>0</reset>
+      <!--启用涟水模式 出口在免费时间段收费为0  1启用  0不启用  2时段内不收费--> 
+      <useFreeTime>0</useFreeTime>
+      <!--免费时间段开始时间-->
+      <freeStartTime>23:30:00</freeStartTime>
+      <!--免费时间段结束时间-->
+      <freeEndTime>06:00:00</freeEndTime>
+      <!--最大周期时长-->
+      <maxCycle>1440</maxCycle>
+      <!--最大周期上限金额-->
+      <!--小车 -->
+      <smallMaxToll>8000</smallMaxToll>
+      <!--大车 -->
+      <largeMaxToll>8000</largeMaxToll>
+      <!--超过最大收费周期计算规则 1-重复计算 2-累计计算-->
+      <beyoneChargeFlag>2</beyoneChargeFlag>
+      <!--版本-->
+      <version>20170903</version>
+      <!--备注-->
+      <sComment></sComment>
+    </setting> 
+
+    <node1>
+      <!--时间长度-->
+      <startLong>30</startLong>
+      <!--计费周期-->
+      <period>30</period>
+      <!--限价-->
+      <limitToll>1000</limitToll>
+      <!--小车单价-->
+      <smallToll>1000</smallToll>
+      <!--大车单价-->
+      <largeToll>1000</largeToll>
+    </node1>
+
+    <node2>
+      <!--时间长度-->
+      <startLong>60</startLong>
+      <!--计费周期-->
+      <period>60</period>
+      <!--限价-->
+      <limitToll>1000</limitToll>
+      <!--小车单价-->
+      <smallToll>1000</smallToll>
+      <!--大车单价-->
+      <largeToll>1000</largeToll>
+    </node2>
+
+    <node3>
+      <!--时间长度-->
+      <startLong>0</startLong>
+      <!--计费周期-->
+      <period>0</period>
+      <!--限价-->
+      <limitToll>0</limitToll>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node3>
+
+    <node4>
+      <!--时间长度-->
+      <startLong>0</startLong>
+      <!--计费周期-->
+      <period>0</period>
+      <!--限价-->
+      <limitToll>0</limitToll>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node4>
+
+    <node5>
+      <!--时间长度-->
+      <startLong>0</startLong>
+      <!--计费周期-->
+      <period>0</period>
+      <!--限价-->
+      <limitToll>0</limitToll>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node5>
+  </chargeRule>
+  
+  <!--次票收费模式-->
+  <chargeRule type ="3">
+    <setting>
+      <!--计费id -->
+	  <id>3</id>
+      <!--计费类型-->
+      <type>1</type>
+      <!--节点个数-->
+      <num>2</num>
+      <!--免费时间-->
+      <freeTime>30</freeTime>
+      <!--最大周期时长-->
+      <maxCycle>1440</maxCycle>
+      <!--最大周期上限金额-->
+      <maxToll>100</maxToll>
+      <!--次票一次停车时长-->
+      <timesUserMax>720</timesUserMax>
+      <!--最大周期计费规则金额指向的节点   0-按照进入停车场时间计算费用  1-5：按照指定节点计算费用 6：按照离开停车场时间计算费用-->
+      <maxChargeNode>0</maxChargeNode>
+      <!--版本-->
+      <version>20170903</version>
+      <!--备注-->
+      <sComment></sComment>
+    </setting>
+
+    <node1>
+      <!--开始时间-->
+      <startTime>07:00:00</startTime>
+      <!--结束时间-->
+      <endTime>20:00:00</endTime>
+      <!--小车单价-->
+      <smallToll>200</smallToll>
+      <!--大车单价-->
+      <largeToll>200</largeToll>
+    </node1>
+
+    <node2>
+      <!--开始时间-->
+      <startTime>20:00:00</startTime>
+      <!--结束时间-->
+      <endTime>07:00:00</endTime>
+      <!--小车单价-->
+      <smallToll>100</smallToll>
+      <!--大车单价-->
+      <largeToll>100</largeToll>
+    </node2>
+
+    <node3>
+      <!--开始时间-->
+      <startTime>17:00:00</startTime>
+      <!--结束时间-->
+      <endTime>01:00:00</endTime>
+      <!--小车单价-->
+      <smallToll>20</smallToll>
+      <!--大车单价-->
+      <largeToll>30</largeToll>
+    </node3>
+
+    <node4>
+      <!--开始时间-->
+      <startTime>0</startTime>
+      <!--结束时间-->
+      <endTime>0</endTime>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node4>
+
+    <node5>
+      <!--开始时间-->
+      <startTime>0</startTime>
+      <!--结束时间-->
+      <endTime>0</endTime>
+      <!--小车单价-->
+      <smallToll>0</smallToll>
+      <!--大车单价-->
+      <largeToll>0</largeToll>
+    </node5>
+  </chargeRule>
+
+
+<!--  特殊计费:省人民医院享受特殊优惠  -->
+	<chargeRule type="4">
+		<setting>
+			<!--计费id -->
+			<id>41</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>15</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>1440</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>1000</maxToll> -->
+<!-- 			一周内免费时间 -->
+			<freeWeekday>6|7</freeWeekday>
+<!-- 			跳转周期时间 -->
+			<changeCycle>3</changeCycle>
+<!-- 			跳转计费id -->
+			<changeId>14</changeId>
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>备注</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>17:30:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>2</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>1200</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>1200</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>200</smallToll>
+			<!--大车单价 -->
+			<largeToll>200</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>17:30:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>2</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>0</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>0</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>0</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>0</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>0</smallToll>
+			<!--大车单价 -->
+			<largeToll>0</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+
+<!--  特殊计费:省人民医院享受特殊优惠  -->
+	<chargeRule type="4">
+		<setting>
+			<!--计费id -->
+			<id>42</id>
+			<!--计费类型 -->
+			<type>1</type>
+			<!--节点个数 -->
+			<num>2</num>
+			<!--免费时间 -->
+			<freeTime>15</freeTime>
+			<!--最大周期时长 -->
+<!-- 			<maxCycle>1440</maxCycle> -->
+			<!--最大周期上限金额 -->
+<!-- 			<maxToll>1000</maxToll> -->
+<!-- 			一周内免费时间 -->
+			<freeWeekday>6|7</freeWeekday>
+<!-- 			跳转周期时间 -->
+			<changeCycle>0</changeCycle>
+<!-- 			跳转计费id -->
+			<changeId>42</changeId>
+			<!--版本 -->
+			<version>1</version>
+			<!--备注 -->
+			<sComment>备注</sComment>
+		</setting>
+
+		<node1>
+			<!--开始时间 -->
+			<startTime>08:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>17:30:00</endTime>
+			<!--计费周期 -->
+			<period>15</period>
+			<!--最大上限类型 1.时间，2.金额,其他.没有上限-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>3600</smallLimitToll>
+            <!-- 大车限价 -->
+			<largeLimitToll>3600</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>150</smallToll>
+			<!--大车单价 -->
+			<largeToll>150</largeToll>
+		</node1>
+
+		<node2>
+			<!--开始时间 -->
+			<startTime>17:30:00</startTime>
+			<!--结束时间 -->
+			<endTime>08:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>2</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>0</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>0</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>0</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>0</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>0</smallToll>
+			<!--大车单价 -->
+			<largeToll>0</largeToll>
+		</node2>
+		
+		<node3>
+			<!--开始时间 -->
+			<startTime>14:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>20:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>10</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node3>
+		
+		<node4>
+			<!--开始时间 -->
+			<startTime>20:00:00</startTime>
+			<!--结束时间 -->
+			<endTime>02:00:00</endTime>
+			<!--计费周期 -->
+			<period>60</period>
+			<!--最大上限类型 1.时间，2.金额-->
+			<limitType>1</limitType>
+			<!--小车限价时间 -->
+			<smallLimitTime>360</smallLimitTime>
+			<!--大车限价时间 -->
+			<largeLimitTime>360</largeLimitTime>
+			<!--小车限价 -->
+			<smallLimitToll>500</smallLimitToll>
+			<!--大车限价 -->
+			<largeLimitToll>500</largeLimitToll>
+			<!--小车单价 -->
+			<smallToll>1</smallToll>
+			<!--大车单价 -->
+			<largeToll>10</largeToll>
+		</node4>
+	</chargeRule>
+
+</chargeRules>

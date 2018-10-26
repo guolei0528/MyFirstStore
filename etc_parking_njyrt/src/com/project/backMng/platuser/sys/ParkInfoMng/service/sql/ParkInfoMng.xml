@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.sys.ParkInfoMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM park_info t
+		 WHERE 1=1
+		 <if test="QUERY_NAME!=null and QUERY_NAME!=''">
+				AND t.NAME like CONCAT('%', #{QUERY_NAME}, '%')
+			</if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+    	SELECT 
+			t.park_id,
+			t.park_name,
+			t.park_address,
+			t.spare1,
+				
+			t.spare2,
+			t.spare3,
+			t.spare4,
+			t.s_comment
+				
+		  FROM park_info t
+			WHERE delete_flag=0
+			and park_id!='0'
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+    	INSERT INTO park_info(
+				park_id,
+				park_name,
+				park_address,
+				spare1,
+			
+				spare2,
+				spare3,
+				spare4,
+				s_comment,
+				delete_flag
+			
+				)
+		VALUES(
+				
+				#{park_id},
+				#{park_name} ,
+				#{park_address} ,
+				#{spare1} ,
+			
+				#{spare2} ,
+				#{spare3} ,
+				#{spare4} ,
+				#{s_comment} ,
+				#{delete_flag}
+			
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+        SELECT 
+			t.park_id,
+			t.park_name,
+			t.park_address,
+			t.spare1,
+				
+			t.spare2,
+			t.spare3,
+			t.spare4,
+			t.s_comment
+				
+		  FROM park_info t
+        WHERE t.park_id=#{VALUE}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.platuser.sys.ParkInfoMng.model.ParkInfoBean">
+		UPDATE park_info
+		SET 
+			park_id=#{park_id} ,
+			park_name=#{park_name} ,
+			park_address=#{park_address} ,
+<!-- 			spare1=#{spare1} , -->
+			
+<!-- 			spare2=#{spare2} , -->
+<!-- 			spare3=#{spare3} , -->
+<!-- 			spare4=#{spare4} , -->
+			s_comment=#{s_comment} 
+			
+		WHERE park_id=#{park_id}
+    </update>
+	
+    <update id="delete" parameterType="String">
+    	UPDATE park_info
+    	SET delete_flag=1
+		 WHERE park_id = #{value}
+    </update>
+    <update id="deleteArea" parameterType="String">
+    	UPDATE area_info
+    	SET delete_flag=1
+		 WHERE park_id = #{value}
+    </update>
+    <update id="deleteLane" parameterType="String">
+    	UPDATE lane_info
+    	SET delete_flag=1
+		 WHERE park_id = #{value}
+    </update>
+    
+    <select id="loadParkTree" parameterType="String" resultType="treeModel">
+    	select t.park_id id,t.park_name name, 'true' isParent,'1' nodeType,
+    	'0' parentId
+    	from park_info t
+    	WHERE park_id!='0'
+    	and delete_flag=0
+    </select>
+    
+    
+</mapper>

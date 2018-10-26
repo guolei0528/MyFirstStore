@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+						http://www.springframework.org/schema/jdbc
+						http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-4.3.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+
+	<!--<bean id="platUserMngAction" class="com.project.backMng.admin.sys.action.PlatUserMngAction" 
+		scope="prototype"> <property name="platUserMngService" ref="platUserMngService"></property> 
+		<property name="roleMngService" ref="roleMngService"></property> </bean> 
+		<bean id="platUserMngService" class="com.project.backMng.admin.sys.service.PlatUserMngServiceImpl" 
+		parent="baseService"> </bean> -->
+
+
+	<bean id="userMngAction" class="com.project.backMng.admin.sys.action.UserMngAction"
+		scope="prototype">
+		<property name="UserMngService" ref="UserMngService"></property>
+		<property name="roleMngService" ref="roleMngService"></property>
+		<property name="areaInfoMngService" ref="areaInfoMngService"></property>
+	</bean>
+
+	<bean id="UserMngService"
+		class="com.project.backMng.admin.sys.service.UserMngServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="areaInfoMngService" 
+		class="com.project.backMng.platuser.sys.AreaInfoMng.service.AreaInfoMngServiceImpl" 
+		parent="baseService">
+	</bean>
+	
+	<bean id="chargeRuleMngAction"
+		class="com.project.backMng.admin.ChargeRuleMng.action.ChargeRuleMngAction"
+		scope="prototype">
+		<property name="chargeRuleMngService" ref="chargeRuleMngService"></property>
+	</bean>
+
+	<bean id="chargeRuleMngService"
+		class="com.project.backMng.admin.ChargeRuleMng.service.ChargeRuleMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+	<bean id="issueBatchMngAction"
+		class="com.project.backMng.admin.coupon.action.IssueBatchMngAction"
+		scope="prototype">
+		<property name="issueBatchMngService" ref="issueBatchMngService"></property>
+	</bean>
+
+	<bean id="issueBatchMngService"
+		class="com.project.backMng.admin.coupon.service.IssueBatchMngServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="couponMngAction"
+		class="com.project.backMng.admin.coupon.action.CouponMngAction"
+		scope="prototype">
+		<property name="couponMngService" ref="couponMngService"></property>
+	</bean>
+
+	<bean id="couponMngService"
+		class="com.project.backMng.admin.coupon.service.CouponMngServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="memberInfoMngAction"
+		class="com.project.backMng.admin.member.action.MemberInfoMngAction"
+		scope="prototype">
+		<property name="MemberInfoMngService" ref="MemberInfoMngService"></property>
+	</bean>
+
+	<bean id="MemberInfoMngService"
+		class="com.project.backMng.admin.member.service.MemberInfoMngServiceImpl"
+		parent="baseService">
+	</bean>
+	<bean id="carInfoMngAction"
+		class="com.project.backMng.admin.member.action.CarInfoMngAction"
+		scope="prototype">
+		<property name="CarInfoMngService" ref="CarInfoMngService"></property>
+	</bean>
+
+	<bean id="CarInfoMngService"
+		class="com.project.backMng.admin.member.service.CarInfoMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+	<bean id="memberSaleMngAction"
+		class="com.project.backMng.admin.member.action.MemberSaleMngAction"
+		scope="prototype">
+		<property name="MemberSaleMngService" ref="MemberSaleMngService"></property>
+	</bean>
+
+	<bean id="MemberSaleMngService"
+		class="com.project.backMng.admin.member.service.MemberSaleMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="whiteListMngAction"
+		class="com.project.backMng.admin.whiteListMng.action.WhiteListMngAction"
+		scope="prototype">
+		<property name="whiteListMngService" ref="whiteListMngService"></property>
+	</bean>
+
+	<bean id="whiteListMngService"
+		class="com.project.backMng.admin.whiteListMng.service.WhiteListMngServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	
+	<bean id="whiteListParkPlaceMngAction"
+		class="com.project.backMng.admin.whiteListMng.action.WhiteListParkPlaceMngAction"
+		scope="prototype">
+		<property name="whiteListParkPlaceMngService" ref="whiteListParkPlaceMngService"></property>
+	</bean>
+
+	<bean id="whiteListParkPlaceMngService"
+		class="com.project.backMng.admin.whiteListMng.service.WhiteListParkPlaceMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+<!-- 	<bean id="whiteListDeptMngAction" 
+		class="com.project.backMng.admin.whiteListMng.action.WhiteListDeptMngAction"
+		scope="prototype">
+		<property name="whiteListDeptMngService" ref="whiteListDeptMngService"></property>
+	</bean>
+
+	<bean id="whiteListDeptMngService"
+		class="com.project.backMng.admin.whiteListMng.service.WhiteListDeptMngServiceImpl"
+		parent="baseService">
+	</bean>
+-->
+
+
+
+	<bean id="parkVoidCardMngAction"
+		class="com.project.backMng.admin.voidCard.ParkVoidCardMng.action.ParkVoidCardMngAction"
+		scope="prototype">
+		<property name="parkVoidCardMngService" ref="parkVoidCardMngService"></property>
+	</bean>
+
+	<bean id="parkVoidCardMngService"
+		class="com.project.backMng.admin.voidCard.ParkVoidCardMng.service.ParkVoidCardMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="etcVoidCardMngAction"
+		class="com.project.backMng.admin.voidCard.EtcVoidCardMng.action.EtcVoidCardMngAction"
+		scope="prototype">
+		<property name="etcVoidCardMngService" ref="etcVoidCardMngService"></property>
+	</bean>
+
+	<bean id="etcVoidCardMngService"
+		class="com.project.backMng.admin.voidCard.EtcVoidCardMng.service.EtcVoidCardMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+	<bean id="etcBlackListAction"
+		class="com.project.backMng.admin.voidCard.EtcBlackListMng.action.EtcBlackListMngAction"
+		scope="prototype">
+		<property name="etcBlackListMngService" ref="etcBlackListMngService"></property>
+	</bean>
+
+	<bean id="etcBlackListMngService"
+		class="com.project.backMng.admin.voidCard.EtcBlackListMng.service.EtcBlackListMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+
+	<bean id="policeVoidCardMngAction"
+		class="com.project.backMng.admin.voidCard.PoliceVoidCardMng.action.PoliceVoidCardMngAction"
+		scope="prototype">
+		<property name="policeVoidCardMngService" ref="policeVoidCardMngService"></property>
+	</bean>
+
+	<bean id="policeVoidCardMngService"
+		class="com.project.backMng.admin.voidCard.PoliceVoidCardMng.service.PoliceVoidCardMngServiceImpl"
+		parent="baseService">
+	</bean>
+	<bean id="txbVoidCardMngAction"
+		class="com.project.backMng.admin.voidCard.TxbVoidCardMng.action.TxbVoidCardMngAction"
+		scope="prototype">
+		<property name="txbVoidCardMngService" ref="txbVoidCardMngService"></property>
+	</bean>
+
+	<bean id="txbVoidCardMngService"
+		class="com.project.backMng.admin.voidCard.TxbVoidCardMng.service.TxbVoidCardMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="entryMngAction"
+		class="com.project.backMng.admin.transitRecord.EntryMng.action.EntryMngAction"
+		scope="prototype">
+		<property name="entryMngService" ref="entryMngService"></property>
+	</bean>
+
+	<bean id="entryMngService"
+		class="com.project.backMng.admin.transitRecord.EntryMng.service.EntryMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="exitMngAction"
+		class="com.project.backMng.admin.transitRecord.ExitMng.action.ExitMngAction"
+		scope="prototype">
+		<property name="exitMngService" ref="exitMngService"></property>
+	</bean>
+
+	<bean id="exitMngService"
+		class="com.project.backMng.admin.transitRecord.ExitMng.service.ExitMngServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="compreSearchAction"
+		class="com.project.backMng.admin.transitRecord.CompreSearch.action.CompreSearchAction"
+		scope="prototype">
+		<property name="compreSearchService" ref="compreSearchService"></property>
+	</bean>
+
+	<bean id="compreSearchService"
+		class="com.project.backMng.admin.transitRecord.CompreSearch.service.CompreSearchServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="flowIncomeReportAction"
+		class="com.project.backMng.admin.report.action.FlowIncomeReportAction"
+		scope="prototype">
+		<property name="flowIncomeReportService" ref="flowIncomeReportService"></property>
+	</bean>
+
+	<bean id="flowIncomeReportService"
+		class="com.project.backMng.admin.report.service.FlowIncomeReportServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="flowReportAction"
+		class="com.project.backMng.admin.report.action.FlowReportAction"
+		scope="prototype">
+		<property name="flowReportService" ref="flowReportService"></property>
+	</bean>
+
+	<bean id="flowReportService"
+		class="com.project.backMng.admin.report.service.FlowReportServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="incomeReportAction"
+		class="com.project.backMng.admin.report.action.IncomeReportAction"
+		scope="prototype">
+		<property name="incomeReportService" ref="incomeReportService"></property>
+	</bean>
+
+	<bean id="incomeReportService"
+		class="com.project.backMng.admin.report.service.IncomeReportServiceImpl"
+		parent="baseService">
+	</bean>
+
+
+	<bean id="paymentStatementAction"
+		class="com.project.backMng.admin.report.action.PaymentStatementAction"
+		scope="prototype">
+		<property name="paymentStatementService" ref="paymentStatementService"></property>
+	</bean>
+
+	<bean id="paymentStatementService"
+		class="com.project.backMng.admin.report.service.PaymentStatementServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="centerPayReportAction"
+		class="com.project.backMng.admin.report.action.CenterPayReportAction"
+		scope="prototype">
+		<property name="centerPayReportService" ref="centerPayReportService"></property>
+	</bean>
+
+	<bean id="centerPayReportService"
+		class="com.project.backMng.admin.report.service.CenterPayReportServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="mobileReportAction"
+		class="com.project.backMng.admin.report.action.MobileReportAction"
+		scope="prototype">
+		<property name="mobileReportService" ref="mobileReportService"></property>
+	</bean>
+	
+	<bean id="mobileReportService"
+		class="com.project.backMng.admin.report.service.MobileReportServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="entryReportAction"
+		class="com.project.backMng.admin.report.action.EntryReportAction"
+		scope="prototype">
+		<property name="entryReportService" ref="entryReportService"></property>
+	</bean>
+	
+	<bean id="entryReportService"
+		class="com.project.backMng.admin.report.service.EntryReportServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="cashReportAction"
+		class="com.project.backMng.admin.report.action.CashReportAction"
+		scope="prototype">
+		<property name="cashReportService" ref="cashReportService"></property>
+	</bean>
+	
+	<bean id="cashReportService"
+		class="com.project.backMng.admin.report.service.CashReportServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	
+	<bean id="etcReportAction"
+		class="com.project.backMng.admin.report.action.EtcReportAction" 
+		scope="prototype">
+		<property name="etcReportService" ref="etcReportService"></property> 
+	</bean>  
+	
+	<bean id="etcReportService"
+		class="com.project.backMng.admin.report.service.EtcReportServiceImpl"
+		parent="baseService">
+	</bean>
+	
+	<bean id="exitAndTrmlReportAction"
+		class="com.project.backMng.admin.report.action.ExitAndTrmlReportAction"
+		scope="prototype">
+		<property name="exitAndTrmlReportService" ref="exitAndTrmlReportService"></property>
+	</bean>
+	
+	<bean id="exitAndTrmlReportService"
+		class="com.project.backMng.admin.report.service.ExitAndTrmlReportServiceImpl"
+		parent="baseService">
+	</bean>
+	
+
+	<bean id="initChargeService"
+		class="com.project.backMng.admin.ChargeRuleMng.init.InitChargeService"
+		init-method="init">
+	</bean>
+</beans>

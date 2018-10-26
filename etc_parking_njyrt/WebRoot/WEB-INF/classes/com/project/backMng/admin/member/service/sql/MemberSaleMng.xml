@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.member.MemberSaleMng">
+	<resultMap id="memberSaleResultMap" type="memberSaleBean">
+    <id column="member_id" property="memberId" jdbcType="VARCHAR" />
+    <id column="member_name" property="memberName" jdbcType="VARCHAR" />
+    <id column="member_type" property="memberType" jdbcType="VARCHAR" />
+    <id column="begin_time" property="beginTime" jdbcType="VARCHAR" />
+    <id column="end_time" property="endTime" jdbcType="VARCHAR" />
+    <id column="park_id" property="parkId" jdbcType="VARCHAR" />
+    <id column="area_id" property="areaId" jdbcType="VARCHAR" />
+    <result column="issue_time" property="issueTime" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="valid" property="valid" jdbcType="VARCHAR" />
+    <result column="cancel_time" property="cancelTime" jdbcType="VARCHAR" />
+    <result column="count" property="count" jdbcType="INTEGER" />
+    <result column="money" property="money" jdbcType="INTEGER" />
+    <result column="total_minute" property="totalMinute" jdbcType="INTEGER" />
+    <result column="total_count" property="totalCount" jdbcType="INTEGER" />
+    <result column="lane_id" property="laneId" jdbcType="VARCHAR" />
+    <result column="spare1" property="spare1" jdbcType="INTEGER" />
+    <result column="spare2" property="spare2" jdbcType="INTEGER" />
+    <result column="spare3" property="spare3" jdbcType="VARCHAR" />
+    <result column="spare4" property="spare4" jdbcType="VARCHAR" />
+    <result column="s_comment" property="sComment" jdbcType="VARCHAR" />
+	</resultMap>
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM member_sale_info t,member m
+		WHERE 1=1 AND T.valid = 0 AND m.member_id = t.member_id
+		AND m.delete_flag = 0
+		<if test="query_member_id!=null and query_member_id!=''">
+			AND t.member_id like CONCAT('%', #{query_member_id}, '%')
+		</if>
+		<if test="query_member_type!=null and query_member_type!=''">
+			AND t.member_type like CONCAT('%', #{query_member_type}, '%')
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap" resultMap="memberSaleResultMap">
+		SELECT
+		t.member_id,
+		m.name as member_name,
+		t.member_type,
+		DATE_FORMAT(t.issue_time,'%Y-%m-%d %H:%i:%s') issue_time,
+		DATE_FORMAT(t.begin_time,'%Y-%m-%d %H:%i:%s') begin_time,
+		DATE_FORMAT(t.end_time,'%Y-%m-%d %H:%i:%s') end_time,
+		t.count,
+		t.money,
+		t.total_minute,
+		t.total_count,
+		t.park_id,
+		t.area_id
+		FROM member_sale_info t,member m
+		WHERE 1=1 AND T.valid = 0 AND m.member_id = t.member_id
+		AND m.delete_flag = 0
+		<if test="query_member_id!=null and query_member_id!=''">
+			AND t.member_id like CONCAT('%', #{query_member_id}, '%')
+		</if>
+		<if test="query_member_type!=null and query_member_type!=''">
+			AND t.member_type like CONCAT('%', #{query_member_type}, '%')
+		</if>
+		ORDER BY t.member_id asc
+	</select>
+
+
+    <!-- 查询当前员工售卖信息 -->
+	<select id="findInfo" parameterType="objectMap" resultMap="memberSaleResultMap">
+		SELECT
+		t.member_id,
+		t.member_type,
+		t.card_id,
+		DATE_FORMAT(t.issue_time,'%Y-%m-%d %H:%i:%s') issue_time,
+		DATE_FORMAT(t.begin_time,'%Y-%m-%d') begin_time,
+		DATE_FORMAT(t.end_time,'%Y-%m-%d') end_time,
+		t.count,
+		t.money,
+		t.total_minute,
+		t.total_count,
+		t.park_id,
+		t.area_id
+		FROM member_sale_info t
+		WHERE t.member_id=#{memberId}
+		and t.member_type =#{memberType}
+		and t.issue_time =#{issueTime}
+		and t.begin_time =#{beginTime}
+		and t.end_time =#{endTime}
+		and t.park_id =#{parkId}
+		and t.area_id =#{areaId}
+	</select>
+
+	<!-- 查询会员编号数量 -->
+	<select id="countByMemberId" parameterType="String" resultType="Integer">
+		SELECT count(1)
+		FROM member t
+		WHERE t.member_id = #{_parameter}
+	</select>
+
+	<!-- 更新项目的信息 -->
+	<update id="update" parameterType="objectMap">
+		UPDATE member_sale_info
+		SET
+		member_type=#{memberType} ,
+		card_id=#{cardId} ,
+		issue_time=#{issueTime},
+		begin_time=#{beginTime},
+		end_time=#{endTime},
+		count=#{count},
+		money=#{money},
+		park_id=#{parkId},
+		area_id=#{areaId}
+		WHERE member_id=#{memberId}
+		and member_type =#{memberType}
+		and issue_time =#{issueTime}
+		and begin_time =#{beginTime}
+		and end_time =#{endTime}
+		and park_id =#{parkId}
+		and area_id =#{areaId}
+	</update>
+
+	<!-- 删除会员信息 <update id="deleteMember" parameterType="String"> UPDATE member 
+		SET DELETE_FLAG = 1 WHERE member_id = #{member_id} </update> -->
+
+	<!-- 删除会员信息 -->
+	<delete id="deleteMember" parameterType="String">
+		delete from member_sale_info 
+		where member_id = #{member_id}
+	</delete>
+	
+		<!-- 删除员工售卖信息 -->
+	<delete id="deleteMemberSale" parameterType="objectMap">
+	delete from member_sale_info 
+		where member_id= #{memberId}
+		and member_type = #{memberType}
+		and issue_time = #{issueTime}
+		and begin_time = #{beginTime}
+		and end_time = #{endTime}
+		and park_id = #{parkId}
+		and area_id = #{areaId}
+	</delete>
+	
+    <!-- 增加会员 -->
+	<insert id="insertMemberSale" parameterType="objectMap">
+		INSERT INTO member_sale_info(member_id, member_type, card_id, issue_time, begin_time,
+		end_time,count,money,park_id,area_id)
+		VALUES (#{member_id}, #{member_type},
+		#{card_id}, #{issue_time}, #{begin_time}, #{end_time},
+		#{count},#{money},#{park_id},#{area_id})
+	</insert>
+
+	<!-- 查询是否存在该会员 -->
+	<select id="findCountByMemberId" parameterType="String"
+		resultType="Integer">
+		SELECT
+		count(1)
+		FROM member t
+		WHERE t.member_id=#{_parameter}
+	</select>
+</mapper>

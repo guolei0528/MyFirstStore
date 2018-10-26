@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+						http://www.springframework.org/schema/tx
+						http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+						http://www.springframework.org/schema/jdbc
+						http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-4.3.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+	<bean id="loginController" class="com.project.sys.admin.login.controller.LoginController">
+		<property name="loginService" ref="loginService"></property>
+	</bean>
+	
+	<bean id="loginService" class="com.project.sys.admin.login.service.LoginServiceImpl" parent="baseService">
+		
+	</bean>
+	
+	<bean id="InitStartService" class="com.project.sys.admin.init.start.InitStartService" init-method="init" parent="baseService">
+	<property name="txbVoidCardMngService" ref="txbVoidCardMngService"></property>
+	<property name="policeVoidCardMngService" ref="policeVoidCardMngService"></property>
+	<property name="parkVoidCardMngService" ref="parkVoidCardMngService"></property>
+	<property name="etcVoidCardMngService" ref="etcVoidCardMngService"></property>
+	<property name="etcBlackListMngService" ref="etcBlackListMngService"></property>
+	</bean>
+</beans>

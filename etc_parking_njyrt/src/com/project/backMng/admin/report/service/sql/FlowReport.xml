@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.FlowReport">
+	<resultMap id="flowReportTempResultMap" type="flowReportTempBean">
+		<id column="date" property="date" jdbcType="INTEGER" />
+		<id column="lane_id" property="laneId" jdbcType="INTEGER" />
+		<id column="lane_flag" property="laneFlag" jdbcType="INTEGER" />
+		<result column="park_id" property="parkId" jdbcType="VARCHAR" />
+		<result column="area_id" property="areaId" jdbcType="VARCHAR" />
+		<result column="vehicleclass" property="vehicleclass" jdbcType="INTEGER" />
+		<result column="paymethod" property="paymethod" jdbcType="INTEGER" />
+		<result column="cardnetwork" property="cardnetwork" jdbcType="INTEGER" />
+		<result column="ecardtype" property="ecardtype" jdbcType="INTEGER" />
+		<result column="count_flow" property="countFlow" jdbcType="INTEGER" />
+	</resultMap>
+
+	<!-- 查询总数量 -->
+	<select id="findCountFlowReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1) FROM (
+		SELECT 1
+		FROM cur_entry t
+		WHERE t.recordtype = 3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.entrydate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.entrydate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.entrytime,"%Y-%m-%d"),t.entrylane
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.entrydate,t.entrylane
+		</if>
+		) as tmp
+	</select>
+
+	<!-- 查询总数量 -->
+	<select id="findCountExitFlowReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1) FROM (
+		SELECT 1
+		FROM cur_exit t
+		WHERE t.recordtype = 3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.exittime,"%Y-%m-%d"),t.exitlane
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.exitdate,t.exitlane
+		</if>
+		) as tmp
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findListFlowReport" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.FlowReportBean">
+		SELECT
+		<if test="date_type!=null and date_type==1">
+			DATE_FORMAT(t.entrytime,"%Y%m%d") date,
+		</if>
+		<if test="date_type!=null and date_type==2">
+			t.entrydate date,
+		</if>
+		t.entrylane laneId,l.lane_name laneName,
+		p.park_name parkName,a.area_name areaName,1
+		laneFlag
+		FROM cur_entry t
+		LEFT JOIN lane_info l
+		on l.lane_id =
+		t.entrylane AND l.delete_flag = 0
+		LEFT JOIN park_info p on p.park_id =
+		l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN area_info a on a.area_id =
+		l.area_id AND a.park_id = l.park_id
+		AND a.delete_flag = 0
+		WHERE
+		t.recordtype=3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.entrydate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.entrydate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.entrytime,"%Y-%m-%d"),t.entrylane
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.entrydate,t.entrylane
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findListExitFlowReport" parameterType="objectMap"
+		resultType="com.project.backMng.admin.report.model.FlowReportBean">
+		SELECT 
+		<if test="date_type!=null and date_type==1">
+			DATE_FORMAT(t.exittime,"%Y%m%d") date,
+		</if>
+		<if test="date_type!=null and date_type==2">
+			t.exitdate date,
+		</if>
+		t.exitlane laneId,l.lane_name laneName,
+		p.park_name
+		parkName,a.area_name areaName,2 laneFlag
+		FROM cur_exit t
+		LEFT JOIN
+		lane_info l
+		on l.lane_id = t.exitlane AND l.delete_flag = 0
+		LEFT JOIN
+		park_info p on p.park_id = l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN
+		area_info a on a.area_id = l.area_id AND a.park_id = l.park_id
+		AND
+		a.delete_flag = 0
+		WHERE t.recordtype=3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.exittime,"%Y-%m-%d"),t.exitlane
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.exitdate,t.exitlane
+		</if>
+	</select>
+
+	<!-- 查询出口流量数据列表 -->
+	<select id="findListFlowReportDetail" parameterType="objectMap"
+		resultMap="flowReportTempResultMap">
+		SELECT
+		<if test="date_type!=null and date_type==1">
+			DATE_FORMAT(t.entrytime,"%Y%m%d") date,
+		</if>
+		<if test="date_type!=null and date_type==2">
+			t.entrydate date,
+		</if>
+		t.entrylane lane_id,1
+		lane_flag,t.vehicleclass,t.paymethod,
+		t.ecardtype
+		as ecardtype,count(1) count_flow
+		FROM cur_entry t
+		WHERE t.recordtype=3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.entrydate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.entrydate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY
+			DATE_FORMAT(t.entrytime,"%Y-%m-%d"),t.entrylane,t.vehicleclass,
+			t.paymethod,t.ecardtype
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.entrydate,t.entrylane,t.vehicleclass,
+			t.paymethod,t.ecardtype
+		</if>
+	</select>
+
+	<!-- 查询出口流量数据列表 -->
+	<select id="findListExitFlowReportDetail" parameterType="objectMap"
+		resultMap="flowReportTempResultMap">
+		SELECT 
+		<if test="date_type!=null and date_type==1">
+			DATE_FORMAT(t.exittime,"%Y%m%d") date,
+		</if>
+		<if test="date_type!=null and date_type==2">
+			t.exitdate date,
+		</if>
+		t.exitlane lane_id,1
+		lane_flag,t.vehicleclass,t.paymethod,
+		t.ecardtype as ecardtype,count(1)
+		count_flow
+		FROM cur_exit t
+		WHERE t.recordtype=3
+		<if test="date_type!=null and date_type==1 and query_time_from!=null and query_time_from!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_from!=null and query_time_from!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[>=]]> DATE_FORMAT(#{query_time_from},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==1 and query_time_to!=null and query_time_to!=''">
+			and DATE_FORMAT(t.exittime,"%Y-%m-%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="date_type!=null and date_type==2 and query_time_to!=null and query_time_to!=''" >
+			and str_to_date(t.exitdate,"%Y%m%d") <![CDATA[<=]]> DATE_FORMAT(#{query_time_to},"%Y-%m-%d")
+		</if>
+		<if test="query_start_date!=null and query_start_date!=''">
+			and date <![CDATA[>=]]>
+			#{query_start_date}
+		</if>
+		<if test="query_end_date!=null and query_end_date!=''">
+			and date <![CDATA[<=]]>
+			#{query_end_date}
+		</if>
+		<if test="date_type!=null and date_type==1">
+			GROUP BY DATE_FORMAT(t.exittime,"%Y-%m-%d"),t.exitlane,t.vehicleclass,
+		t.paymethod,t.ecardtype
+		</if>
+		<if test="date_type!=null and date_type==2">
+			GROUP BY t.exitdate,t.exitlane,t.vehicleclass,
+		t.paymethod,t.ecardtype
+		</if>
+	</select>
+
+	<!-- 更新流量的信息 -->
+	<update id="updateFlowReport"
+		parameterType="com.project.backMng.admin.report.model.FlowReportBean">
+		UPDATE flow_report
+		SET
+		car_store_value=#{carStoreValue} ,
+		car_account=#{carAccount} ,
+		car_mobile=#{carMobile},
+		car_cash=#{carCash},
+		cart_store_value=#{cartStoreValue},
+		cart_account =
+		#{cartAccount},
+		cart_cash=#{cartCash}
+		WHERE date=#{date}
+		AND
+		lane_id=#{laneId}
+		AND lane_flag=#{laneFlag}
+	</update>
+
+	<!-- 新增流量的信息 -->
+	<insert id="insertFlowReport"
+		parameterType="com.project.backMng.admin.report.model.FlowReportBean">
+		INSERT INTO flow_report(
+		date,
+		lane_id,
+		lane_flag,
+		car_store_value,
+		car_account,
+		car_mobile,
+		car_cash,
+		cart_store_value,
+		cart_account,
+		cart_mobile,
+		cart_cash
+		)
+		VALUES(
+		#{date} ,
+		#{laneId} ,
+		#{laneFlag} ,
+		#{carStoreValue} ,
+		#{carAccount} ,
+		#{carMobile} ,
+		#{carCash} ,
+		#{cartStoreValue} ,
+		#{cartAccount} ,
+		#{cartMobile} ,
+		#{cartCash}
+		)
+	</insert>
+
+
+
+	<!-- 删除流量信息 -->
+	<delete id="deleteFlowReport" parameterType="objectMap">
+		delete from flow_report
+	</delete>
+
+</mapper>

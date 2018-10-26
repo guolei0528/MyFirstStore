@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.OrderCarReport">
+
+	<!-- 查询对账明细订单数量 -->
+	<select id="findCountReport" parameterType="objectMap"
+		resultType="Integer">
+		SELECT COUNT(1)
+		FROM order_car t
+		WHERE t.is_vaild =1
+		and t.pay_method in (3,4)
+		<if test="query_deal_start_time!=null and query_deal_start_time!=''">
+			and t.deal_time <![CDATA[>=]]>
+			#{query_deal_start_time}
+		</if>
+		<if test="query_deal_end_time!=null and query_deal_end_time!=''">
+			and t.deal_time <![CDATA[<=]]>
+			#{query_deal_end_time}
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mv_license like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_entry_lane!=null and query_entry_lane!=''">
+			and t.entry_lane = #{query_entry_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.pay_method = #{query_pay_method}
+		</if>
+		<if test="query_order_id!=null and query_order_id!=''">
+			and t.order_id like CONCAT('%',#{query_order_id},'%')
+		</if>
+		order by t.deal_time desc
+		
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+
+
+	<!-- 查询对账明细数据 -->
+	<select id="findReport" parameterType="objectMap"
+		resultType="objectMap">
+		SELECT
+		t.order_id,
+		t.trade_no,
+		t.trade_type,
+		t.mv_license,
+		t.plate_color,
+		t.park_id,t.area_id,p.park_name,a.area_name,t.entry_lane,l.lane_name entry_lane,
+		t.entry_time,
+		t.pay_method,
+		t.pay_bill,
+		t.pay_time,
+		t.deal_time,
+		t.service_method,
+		t.is_synchro,
+		t.is_refund,
+		t.is_vaild,
+   		(select count(1) from white_list wl where wl.mv_license = t.mv_license 
+   		and wl.valid_start_time <![CDATA[<=]]> deal_time
+		and wl.valid_end_time <![CDATA[>=]]> deal_time
+		and wl.status in (3,5,7) and wl.delete_flag = 0) white_count
+		FROM order_car t
+		LEFT JOIN
+		lane_info l
+		on l.lane_id = t.entry_lane AND l.delete_flag = 0
+		LEFT JOIN park_info p on p.park_id = l.park_id
+		AND p.delete_flag = 0
+		LEFT JOIN area_info a on a.area_id = l.area_id AND a.park_id = l.park_id
+		AND a.delete_flag = 0
+		WHERE is_vaild =1
+		AND t.pay_method in (3,4)
+		<if test="query_deal_start_time!=null and query_deal_start_time!=''">
+			and t.deal_time <![CDATA[>=]]>
+			#{query_deal_start_time}
+		</if>
+		<if test="query_deal_end_time!=null and query_deal_end_time!=''">
+			and t.deal_time <![CDATA[<=]]>
+			#{query_deal_end_time}
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mv_license like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_entry_lane!=null and query_entry_lane!=''">
+			and t.entry_lane = #{query_entry_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.pay_method = #{query_pay_method}
+		</if>
+		<if test="query_order_id!=null and query_order_id!=''">
+			and t.order_id like CONCAT('%',#{query_order_id},'%')
+		</if>
+		order by t.deal_time desc
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+	
+<!-- 	查询总计金额 -->
+	<select id="totalList" parameterType="objectMap"
+		resultType="Integer">
+		SELECT ifnull(sum(t.pay_bill),0)
+		FROM order_car t
+		WHERE t.is_vaild = 1
+		AND t.pay_method in (3,4)
+		<if test="query_deal_start_time!=null and query_deal_start_time!=''">
+			and t.deal_time <![CDATA[>=]]>
+			#{query_deal_start_time}
+		</if>
+		<if test="query_deal_end_time!=null and query_deal_end_time!=''">
+			and t.deal_time <![CDATA[<=]]>
+			#{query_deal_end_time}
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[>=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_entry_start_date!=null and query_entry_start_date!=''">
+			and DATE_FORMAT(t.entrytime,"%Y-%m-%d") <![CDATA[<=]]>
+			DATE_FORMAT(#{query_entry_start_date},"%Y-%m-%d")
+		</if>
+		<if test="query_mvlicense!=null and query_mvlicense !=''">
+			and t.mv_license like CONCAT('%',#{query_mvlicense},'%')
+		</if>
+		<if test="query_entry_lane!=null and query_entry_lane!=''">
+			and t.entry_lane = #{query_entry_lane}
+		</if>
+		<if test="query_pay_method!=null and query_pay_method!=''">
+			and t.pay_method = #{query_pay_method}
+		</if>
+		<if test="query_order_id!=null and query_order_id!=''">
+			and t.order_id like CONCAT('%',#{query_order_id},'%')
+		</if>
+		order by t.deal_time desc
+		
+		<!-- <if test="query_lane_id!=null and query_lane_id!=''"> -->
+		<!-- and entrylane like CONCAT('%',#{query_lane_id},'%') -->
+		<!-- </if> -->
+	</select>
+
+	
+	    <!-- 查询数据列表 -->
+    <select id="queryLaneList" resultType="objectMap">
+    	SELECT 
+			lane_id,
+			lane_name
+		  FROM lane_info
+		 WHERE delete_flag=0
+		 and lane_flag=2
+    </select>
+</mapper>

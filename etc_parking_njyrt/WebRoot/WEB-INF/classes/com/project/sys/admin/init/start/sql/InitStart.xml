@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sys.init.InitStart">
+    <select id="selectColEnum" resultType="com.redoak.jar.tag.model.ColEnum">
+    	SELECT COLTYPE, KEYNAME, KEYVALUE, KEYTEXT, CSS, SHOWORDER, DETAILS, ATTR1, ATTR2, ATTR3
+		FROM cf_column_enum
+		ORDER BY COLTYPE ASC , SHOWORDER ASC 
+    </select>
+    
+    <select id="selectProps" resultType="objectMap">
+    	SELECT PROP_KEY, PROP_VALUE
+		FROM init_properties
+    </select>
+    
+    <select id="selectTosendMsgList" resultType="objectMap">
+    	SELECT t.ID, u.LOGIN_NAME USER_PHONE_NO , PHONE_NO, TEMPLATE_ID, PARAM_JSON
+		FROM t_sms_tosend t LEFT JOIN t_login_user u ON t.USER_ID=u.USER_ID
+		WHERE t.SEND_TIME IS NULL 
+		ORDER BY ID ASC 
+    </select>
+    
+    <update id="updateToSendMsgResult" parameterType="objectMap">
+    	UPDATE t_sms_tosend
+		SET SEND_TIME=now(), RESULT=#{RESULT}, RESULT_MESSAGE=#{RESULT_MESSAGE}
+		WHERE ID=#{ID}
+    </update>
+      <select id="validWhiteList" parameterType="objectMap" resultType="String">
+    	select CONCAT(mv_license,'|',color)
+    	from white_list
+    	where  delete_flag=0
+    </select>
+    
+<!--     检查是否需要重新加载黑名单 -->
+    <select id="checkParamTimeVoidCard" resultType="com.project.sys.admin.init.start.model.ParamTimeBean">
+    	select record_no,para_type,para_version,down_load_time,start_time 
+    	from param_time 
+    	where para_type in (1001,1002,1003,25)
+    	and update_flag = '00' 
+    	and start_time >= now()
+    </select>
+    
+    <!-- 增加会员 -->
+	<insert id="insertServerLogs">
+		INSERT INTO server_logs(date_time, type)
+		VALUES (now(),1)
+	</insert>
+
+    
+</mapper>

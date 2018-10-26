@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="reportForms.exit">
+  
+  <resultMap type="com.project.reportForms.model.InOrOutFlowInfo" id="exitMap">
+  	<result column="paymethod" property="type" jdbcType="INTEGER"/>
+  	<result column="flow" property="num" jdbcType="INTEGER"/>
+  	<result column="ymd" property="dateStr" jdbcType="VARCHAR"/>
+  	<result column="income" property="income" jdbcType="INTEGER"/>
+  	<result column="amount" property="amount" jdbcType="INTEGER"/>
+  </resultMap>
+  <!-- 查询当日总收益 -->
+  <select id="getAllIncome" parameterType="objectMap" resultType="Integer">
+  	SELECT SUM(totaltoll) 
+  	FROM cur_exit 
+  	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+  	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+  	AND recordtype=3
+  </select>
+  <!-- 查询当日出口信息 -->
+  <select id="countExitFlow" parameterType="objectMap" resultMap="exitMap">
+  	SELECT paymethod,COUNT(*) flow,sum(totaltoll) income
+	FROM cur_exit
+	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+	AND recordtype=3
+	GROUP BY paymethod
+  </select>
+  <!-- 查询当日总流量 -->
+  <select id="countTotalFlow" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*) 
+  	FROM cur_exit 
+  	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+  	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+  	AND recordtype=3
+  </select>
+  <!-- 查询当日0元流量 -->
+  <select id="countZeroFlow" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*) 
+  	FROM cur_exit 
+  	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+  	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+  	AND totaltoll=0 AND recordtype=3
+  </select>
+  <!-- 查询当日无人值守期间的流量 -->
+  <select id="countNightFlow" parameterType="objectMap" resultMap="exitMap">
+  	SELECT COUNT(*) flow,SUM(totaltoll) income,SUM(pdiscounttoll) amount
+	FROM (
+	SELECT totaltoll,pdiscounttoll
+	FROM cur_exit
+	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+	AND recordtype=3 AND HOUR(exittime)=23 AND MINUTE(exittime)&gt;=30
+	UNION ALL
+	SELECT totaltoll,pdiscounttoll
+	FROM cur_exit
+	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+	AND recordtype=3 AND HOUR(exittime)&lt;6) t
+  </select>
+  <!-- 统计出口表里在某天驶入的车流量 -->
+  <select id="countFlowByEntrytime" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*)
+	FROM cur_exit
+	WHERE TO_DAYS(entrytime)=TO_DAYS(#{ymd,jdbcType=VARCHAR}) AND recordtype=3 AND entrystation=#{parkid,jdbcType=VARCHAR}
+  </select>
+  <!-- 查询出口流水表里在某天驶入的车辆牌照 -->
+  <select id="getLicensesByDay" parameterType="objectMap" resultType="String">
+  	SELECT mvlicense
+	FROM cur_exit
+	WHERE TO_DAYS(entrytime)=TO_DAYS(#{ymd,jdbcType=VARCHAR}) AND recordtype=3 AND entrystation=#{parkid,jdbcType=VARCHAR}
+  </select>
+  <!-- 查询当日驶出的车辆中无入口信息（即入口时间为1970年）的车有几辆 -->
+  <select id="countFlowWithoutEntrytime" parameterType="objectMap" resultType="Integer">
+  	SELECT COUNT(*)
+	FROM cur_exit
+	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+	AND recordtype=3 AND YEAR(entrytime)=1970
+  </select>
+  <!-- 查询当日驶出的车辆分别是哪几日驶入的，各有几辆 -->
+  <select id="groupFlowByEntrytime" parameterType="objectMap" resultMap="exitMap">
+  	<if test="ymd!=null">
+  		SELECT entrydate ymd,COUNT(*) flow
+  		FROM cur_exit
+		WHERE exitstation=#{parkid,jdbcType=VARCHAR} AND exitdate=#{ymd,jdbcType=INTEGER} AND recordtype=3
+		GROUP BY entrydate
+		ORDER BY entrydate DESC
+  	</if>
+  	<if test="time!=null">
+  		SELECT DATE(entrytime) ymd,COUNT(*) flow
+  		FROM cur_exit
+		WHERE exitstation=#{parkid,jdbcType=VARCHAR} AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) AND recordtype=3
+		GROUP BY DATE(entrytime)
+		ORDER BY DATE(entrytime) DESC
+  	</if>
+	<!-- FROM cur_exit
+	WHERE exitstation=#{parkid,jdbcType=VARCHAR} 
+	<if test="ymd!=null">
+  		AND exitdate=#{ymd,jdbcType=INTEGER} 
+  	</if>
+  	<if test="time!=null">
+  		AND to_days(exittime)=to_days(#{time,jdbcType=TIMESTAMP}) 
+  	</if>
+	AND recordtype=3
+	GROUP BY DATE(entrytime)
+	ORDER BY DATE(entrytime) DESC -->
+  </select>
+</mapper>

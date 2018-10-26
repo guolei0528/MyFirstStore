@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.voidCard.EtcBlackListMng">
+	<!-- 查询总数量 -->
+	<select id="findCount" parameterType="objectMap" resultType="Integer">
+		SELECT count(1)
+		FROM etcblacklist${province} t
+		WHERE 1=1
+		<if test="query_IssuerID!=null and query_IssuerID!=''">
+			and t.IssuerID like CONCAT('%',#{query_IssuerID},'%')
+		</if>
+		<if test="query_NetNo!=null and query_NetNo!=''">
+			and t.NetNo like CONCAT('%',#{query_NetNo},'%')
+		</if>
+		<if test="query_CardID!=null and query_CardID!=''">
+			and t.CardID = #{query_CardID}
+		</if>
+		<if test="query_OBUID!=null and query_OBUID!=''">
+			and t.OBUID = #{query_OBUID}
+		</if>
+		<!-- <if test="query_License!=null and query_License!=''"> -->
+		<!-- and t.License like CONCAT('%',#{query_License},'%') -->
+		<!-- </if> -->
+		<if test="query_License!=null and query_License!=''">
+			and t.License = #{query_License}
+		</if>
+		<if test="query_Status!=null and query_Status!=''">
+			and t.Status=#{query_Status}
+		</if>
+		<if test="query_IssuerBlackVersion!=null and query_IssuerBlackVersion!=''">
+			and t.IssuerBlackVersion like
+			CONCAT('%',#{query_IssuerBlackVersion},'%')
+		</if>
+		<if test="query_StartTime_from!=null and query_StartTime_from!=''">
+			and t.StartTime<![CDATA[>=]]>#{query_StartTime_from}
+		</if>
+		<if test="query_StartTime_to!=null and query_StartTime_to!=''">
+			and t.StartTime<![CDATA[<=]]>#{query_iStartTime_to}
+		</if>
+		<if test="query_BlackType!=null and query_BlackType!=''">
+			and t.BlackType=#{query_BlackType}
+		</if>
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" parameterType="objectMap"
+		resultType="com.project.backMng.admin.voidCard.EtcBlackListMng.model.EtcBlackListBean">
+<!-- 		select * from ( -->
+		SELECT
+		IssuerID,NetNo,CardID,OBUID,License,Status,IssuerBlackVersion,CreationTime,ValidFlag,StartTime,SComment,Version,BlackType
+		FROM etcblacklist${province} t
+<!-- 		UNION ALL SELECT -->
+<!-- 		IssuerID,NetNo,CardID,OBUID,License,Status,IssuerBlackVersion,CreationTime,ValidFlag,StartTime,SComment,Version,BlackType -->
+<!-- 		FROM etcblacklist01 -->
+<!-- 		) t -->
+		where 1=1
+		<if test="query_IssuerID!=null and query_IssuerID!=''">
+			and t.IssuerID like CONCAT('%',#{query_IssuerID},'%')
+		</if>
+		<if test="query_NetNo!=null and query_NetNo!=''">
+			and t.NetNo like CONCAT('%',#{query_NetNo},'%')
+		</if>
+		<if test="query_CardID!=null and query_CardID!=''">
+			and t.CardID = #{query_CardID}
+		</if>
+		<if test="query_OBUID!=null and query_OBUID!=''">
+			and t.OBUID = #{query_OBUID}
+		</if>
+		<!-- <if test="query_License!=null and query_License!=''"> -->
+		<!-- and t.License like CONCAT('%',#{query_License},'%') -->
+		<!-- </if> -->
+		<if test="query_License!=null and query_License!=''">
+			and t.License = #{query_License}
+		</if>
+		<if test="query_Status!=null and query_Status!=''">
+			and t.Status=#{query_Status}
+		</if>
+		<if test="query_IssuerBlackVersion!=null and query_IssuerBlackVersion!=''">
+			and t.IssuerBlackVersion like
+			CONCAT('%',#{query_IssuerBlackVersion},'%')
+		</if>
+		<if test="query_StartTime_from!=null and query_StartTime_from!=''">
+			and t.StartTime<![CDATA[>=]]>#{query_StartTime_from}
+		</if>
+		<if test="query_StartTime_to!=null and query_StartTime_to!=''">
+			and t.StartTime<![CDATA[<=]]>#{query_iStartTime_to}
+		</if>
+		<if test="query_BlackType!=null and query_BlackType!=''">
+			and t.BlackType=#{query_BlackType}
+		</if>
+		order by t.CreationTime desc
+		limit #{skipSize},#{pageSize}
+	</select>
+
+	<select id="findEtcBlackListByPageSkipSize" parameterType="objectMap"
+		resultType="com.project.backMng.admin.voidCard.EtcBlackListMng.model.EtcBlackListBean">
+		SELECT
+		t.IssuerID,
+		t.NetNo,
+		t.CardID,
+		t.OBUID,
+		t.License,
+		t.Status,
+		t.IssuerBlackVersion,
+		t.CreationTime,
+		t.ValidFlag,
+		t.StartTime,
+		t.SComment,
+		t.Version,
+		t.BlackType,
+		t.Spare1,
+		t.Spare2,
+		t.Spare3
+		FROM
+		etcblacklist32 t
+		limit #{skipSize},#{pageSize}
+	</select>
+
+
+	<select id="findEtcList" parameterType="objectMap" resultType="Integer">
+		select if((SELECT count(1) FROM
+		etcblacklist${query_black_list_province} t where 1=1 and
+		t.CardID=#{query_CardID})>0
+		or (SELECT count(1) FROM etcblacklist32 t where 1=1 and
+		t.License=#{query_License})>0,1,
+		(SELECT count(1) FROM etcblacklist32 t where 1=1 and t.OBUID=#{query_OBUID}))
+		<!--select if((SELECT count(1) FROM etcblacklist32 t where 1=1 and t.CardID=#{query_CardID})>0 
+			or (SELECT count(1) FROM etcblacklist32 t where 1=1 and t.License=#{query_License})>0 
+			or (SELECT count(1) FROM etcblacklist32 t where 1=1 and t.OBUID=#{query_OBUID}),1,0) -->
+		<!-- <if test="query_License!=null and query_License!=''"> and t.License=#{query_License} 
+			</if> <if test="query_CardID!=null and query_CardID!=''"> and t.CardID=#{query_CardID} 
+			</if> <if test="query_OBUID!=null and query_OBUID!=''"> and t.OBUID=#{query_OBUID} 
+			</if> -->
+	</select>
+
+
+	<select id="findEtcListByCardLicenseOBU" parameterType="objectMap" resultType="Integer">
+		select if(
+		<if test="query_CardID!=null and query_CardID!=''">
+		(SELECT count(1) FROM
+		etcblacklist${query_black_list_province} a where 1=1 and a.status<![CDATA[<>]]>1 and 
+		a.CardID=#{query_CardID} and a.CardID != '' and a.CardID is not null)>0 
+		</if>
+		<if test="query_CardID==null or query_CardID==''">
+		0
+		</if>
+		or 
+		<if test="query_License!=null and query_License!=''">
+		(SELECT count(1) FROM etcblacklist${query_black_list_province} b where 1=1 and b.status<![CDATA[<>]]>1 and 
+		b.License=#{query_License} and b.License != '' and b.License is not null)>0 
+		</if>
+		<if test="query_License==null or query_License==''">
+		0
+		</if>
+		,1,
+		<if test="query_OBUID!=null and query_OBUID!=''">
+		(SELECT count(1) FROM etcblacklist${query_black_list_province} c where 1=1 and c.status<![CDATA[<>]]>1  
+		and right(c.OBUID,8)=#{query_OBUID} and c.OBUID != '' and c.OBUID is not null)
+		</if>
+		<if test="query_OBUID==null or query_OBUID==''">
+		0
+		</if>
+		)
+	</select>
+</mapper>

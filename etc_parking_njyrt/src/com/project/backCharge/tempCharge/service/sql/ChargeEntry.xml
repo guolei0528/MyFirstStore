@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backCharge.tempCharge.chargeEntry">
+        
+<!-- mysql数据库limit 1 -->
+    <select id="findEntryImage" parameterType="objectMap" resultType="com.project.backCharge.tempCharge.model.ChargeEntryBean">
+        SELECT 
+			t.imagepath
+		  FROM cur_entry t
+        WHERE t.entrylane=#{entrylane}
+        and mvlicense like CONCAT('%',#{mvlicense},'%') 
+        and entrytime=#{entrytime}
+        limit 1
+    </select>
+    
+    <select id="findEntryListImage" parameterType="objectMap" resultType="com.project.backCharge.tempCharge.model.ChargeEntryBean">
+        SELECT 
+			t.imagepath
+		  FROM cur_entry t
+        WHERE t.entrylane=#{entrylane}
+        and mvlicense like CONCAT('%',#{mvlicense},'%')
+        and entrytime=#{entrytime}
+    </select>
+    
+</mapper>

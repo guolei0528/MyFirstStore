@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.platuser.sys.CareTrafficRecordMng">
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM care_traffic_record t
+		 WHERE 1=1
+		 <if test="query_lane_flag!=null and query_lane_flag!=''">
+		 and t.lane_flag=#{query_lane_flag}
+		 </if>
+		 <if test="query_area_id!=null and query_area_id!=''">
+		 and t.area_id=#{query_area_id}
+		 </if>
+		 <if test="query_lane_id!=null and query_lane_id!=''">
+		 and t.lane_id=#{query_lane_id}
+		 </if>
+		 <if test="query_date!=null and query_date!=''">
+		 and t.datetime like CONCAT('%',#{query_date},'%')
+		 </if>
+		 <if test="query_pay_method!=null and query_pay_method!=''">
+		 and t.pay_method=#{query_pay_method}
+		 </if>
+		 <if test="query_member_type!=null and query_member_type!=''">
+		 and t.member_type=${query_member_type}
+		 </if>
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+    	SELECT 
+			t.traffic_date,
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+				
+			t.lane_flag,
+			t.care_traffic,
+			t.pay_method,
+			t.member_type,
+				
+			DATE_FORMAT(t.datetime,'%Y-%m-%d')datetime,
+			t.s_comment
+		  FROM care_traffic_record t
+		 WHERE 1=1
+		  <if test="query_lane_flag!=null and query_lane_flag!=''">
+		 and t.lane_flag=#{query_lane_flag}
+		 </if>
+		 <if test="query_area_id!=null and query_area_id!=''">
+		 and t.area_id=#{query_area_id}
+		 </if>
+		 <if test="query_lane_id!=null and query_lane_id!=''">
+		 and t.lane_id=#{query_lane_id}
+		 </if>
+		 <if test="query_date!=null and query_date!=''">
+		 and t.datetime like CONCAT('%',#{query_date},'%')
+		 </if>
+		 <if test="query_pay_method!=null and query_pay_method!=''">
+		 and t.pay_method=#{query_pay_method}
+		 </if>
+		 <if test="query_member_type!=null and query_member_type!=''">
+		 and t.member_type=${query_member_type}
+		 </if>
+    </select>
+    
+	
+    <insert id="insert" parameterType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+    	INSERT INTO care_traffic_record(
+				traffic_date,
+				park_id,
+				area_id,
+				lane_id,
+			
+				lane_flag,
+				care_traffic,
+				pay_method,
+				member_type,
+			
+				datetime,
+				s_comment
+				)
+		VALUES(
+				#{traffic_date} ,
+				#{park_id} ,
+				#{area_id} ,
+				#{lane_id} ,
+			
+				#{lane_flag} ,
+				#{care_traffic} ,
+				#{pay_method} ,
+				#{member_type} ,
+			
+				#{datetime} ,
+				#{s_comment} 
+		)
+    </insert>
+        
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+        SELECT 
+			t.traffic_date,
+			t.park_id,
+			t.area_id,
+			t.lane_id,
+				
+			t.lane_flag,
+			t.care_traffic,
+			t.pay_method,
+			t.member_type,
+				
+			t.datetime,
+			t.s_comment
+		  FROM care_traffic_record t
+        WHERE t.ID=#{VALUE}
+    </select>
+    
+	<!-- 更新项目的信息 -->
+    <update id="update" parameterType="com.project.backMng.platuser.CareTrafficRecordMng.model.CareTrafficRecordBean">
+		UPDATE care_traffic_record
+		SET 
+			traffic_date=#{traffic_date} ,
+			park_id=#{park_id} ,
+			area_id=#{area_id} ,
+			lane_id=#{lane_id} ,
+			
+			lane_flag=#{lane_flag} ,
+			care_traffic=#{care_traffic} ,
+			pay_method=#{pay_method} ,
+			member_type=#{member_type} ,
+			
+			datetime=#{datetime} ,
+			s_comment=#{s_comment} 
+		WHERE ID=#{ID}
+    </update>
+	
+    <update id="delete" parameterType="String">
+    	UPDATE care_traffic_record
+		   SET DELETE_FLAG = 1
+		 WHERE ID = #{value}
+    </update>
+</mapper>

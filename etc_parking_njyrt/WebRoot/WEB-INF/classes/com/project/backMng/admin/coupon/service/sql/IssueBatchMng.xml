@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.coupon.IssueBatchMng">
+
+    <!-- 查询总数量 -->
+    <select id="findCount" parameterType="objectMap" resultType="Integer">
+    	SELECT count(1)
+		  FROM issue_batch t
+		 WHERE 1=1 
+		 <if test="query_issuer_code!=null and query_issuer_code!=''">
+				AND t.issuer_code like CONCAT('%', #{query_issuer_code}, '%')
+		</if>
+		 <if test="query_issue_date!=null">
+				AND t.issue_date = #{query_issue_date}
+		</if>
+		 <if test="query_batch_id!=null">
+				AND t.batch_id like CONCAT('%', #{query_batch_id}, '%')
+		</if>
+		<if test="query_start_time!=null and query_start_time!=''">
+			and t.start_time = DATE_FORMAT(#{query_start_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="query_end_time!=null and query_end_time!=''">
+			and t.end_time = DATE_FORMAT(#{query_end_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		 <if test="query_coupon_type!=null and query_coupon_type!=''">
+				AND t.coupon_type = #{query_coupon_type}
+		</if>
+		<if test="query_status!=null">
+				AND t.status = #{query_status}
+		</if>
+		
+    </select>
+    
+    <!-- 查询数据列表 -->
+    <select id="findList" parameterType="objectMap" resultType="com.project.backMng.admin.coupon.model.IssueBatchMngBean">
+    	SELECT issue_id,issuer_code,(select ci.issuer_name from coupon_issuer ci where t.issuer_code=ci.issuer_code) issuer_name,issue_date,batch_id,start_time,end_time,
+    			coupon_type,issue_count,coupon_toll,status
+		  FROM issue_batch t
+		 WHERE 1=1 
+		 <if test="query_issuer_code!=null and query_issuer_code!=''">
+				AND t.issuer_code like CONCAT('%', #{query_issuer_code}, '%')
+		</if>
+		 <if test="query_issue_date!=null">
+				AND t.issue_date = #{query_issue_date}
+		</if>
+		 <if test="query_batch_id!=null">
+				AND t.batch_id like CONCAT('%', #{query_batch_id}, '%')
+		</if>
+		<if test="query_start_time!=null and query_start_time!=''">
+			and t.start_time = DATE_FORMAT(#{query_start_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		<if test="query_end_time!=null and query_end_time!=''">
+			and t.end_time = DATE_FORMAT(#{query_end_time},'%Y-%m-%d %H:%i:%s')
+		</if>
+		 <if test="query_coupon_type!=null and query_coupon_type!=''">
+				AND t.coupon_type = #{query_coupon_type}
+		</if>
+		<if test="query_status!=null">
+				AND t.status = #{query_status}
+		</if>
+		ORDER BY t.create_time desc
+    </select>
+    
+    
+    <select id="findInfo" parameterType="String" resultType="com.project.backMng.admin.coupon.model.IssueBatchMngBean">
+		SELECT
+		issue_id,
+		coupon_type,
+		use_restrict,
+		station_id,
+		station_name,
+		issuer_code,
+		(select ci.issuer_name from coupon_issuer ci where t.issuer_code=ci.issuer_code) issuer_name,
+		issue_date,
+		batch_id,
+		issue_count,
+		start_time,
+		end_time,
+		use_count,
+		remain_count,
+		invalid_count,
+		coupon_toll,
+		status,
+		create_user,
+		(select name from user u where t.create_user = u.user_id) user_name,
+		create_time
+		FROM issue_batch t
+		WHERE t.issue_id=#{issue_id}
+	</select>
+    
+    <insert id="insertIssueBatch" parameterType="com.project.backMng.admin.coupon.model.IssueBatchMngBean">
+    	INSERT INTO issue_batch(
+				coupon_type,
+				use_restrict,
+				issuer_code,
+				issue_date,
+				batch_id,
+				issue_count,
+				start_time,
+				end_time,
+				use_count,
+				remain_count,
+				invalid_count,
+				coupon_toll,
+				status,
+				create_user,
+				create_time
+				)
+		VALUES(
+				#{coupon_type} ,
+				#{use_restrict} ,
+				#{issuer_code} ,
+				#{issue_date} ,
+				#{batch_id} ,
+				#{issue_count} ,
+				#{start_time} ,
+				#{end_time} ,
+				#{use_count} ,
+				#{remain_count} ,
+				#{invalid_count} ,
+				#{coupon_toll} ,
+				#{status} ,
+				#{create_user} ,
+				#{create_time}
+		)
+    </insert>
+    
+    <select id="findCountByIssueDate" parameterType="INTEGER" resultType="INTEGER">
+		SELECT
+		count(1)
+		FROM issue_batch t
+		WHERE t.issue_date=#{issue_date}
+	</select>
+    
+    <select id="findBatchByIssueDate" parameterType="INTEGER" resultType="INTEGER">
+		SELECT
+		batch_id
+		FROM issue_batch t
+		WHERE t.issue_date=#{issue_date}
+		order by t.batch_id desc
+		limit 1
+	</select>
+    
+    <select id="findIdByIssueDate" parameterType="INTEGER" resultType="INTEGER">
+		SELECT
+		issue_id
+		FROM issue_batch t
+		WHERE t.issue_date=#{issue_date}
+		and t.batch_id=#{batch_id}
+	</select>
+	
+	
+	<select id="findByIssueId" parameterType="objectMap" resultType="com.project.backMng.admin.coupon.model.CouponMngBean">
+		select 
+		c.coupon_type,
+		c.use_restrict,
+		c.issuer_code,
+		(select ci.issuer_name from coupon_issuer ci where c.issuer_code=ci.issuer_code) issuer_name,
+		c.issue_date,
+		c.batch_id,
+		c.verify_code,
+		c.coupon_toll,
+		c.coupon_code,
+		c.start_time,
+		c.end_time,
+		c.issuer_id,
+		c.status,
+		c.create_user,
+		c.create_time
+		from issue_batch ib,coupon c 
+		where ib.issue_id = c.issuer_id and ib.status = 0
+		and ib.issue_id in
+		<foreach collection="issue_id" separator="," item="item" index="idx" open="(" close=")">
+            #{item,jdbcType=INTEGER}
+    	</foreach>
+    	order by c.coupon_code asc
+	</select>
+    
+    
+     <!-- 更新优惠券的状态 -->
+	<update id="updateCouponStatusById" parameterType="objectMap">
+		UPDATE coupon
+		inner join issue_batch 
+    	on issue_batch.issue_id = coupon.issuer_id 
+		SET coupon.status=#{status}
+		WHERE 
+        issue_batch.status = 0
+        and coupon.status = 0
+        and issue_batch.issue_id in
+		<foreach collection="issue_id" separator="," item="item" index="idx" open="(" close=")">
+            #{item,jdbcType=INTEGER}
+    	</foreach>
+	</update>
+    
+     <!-- 更新优惠券批次的状态 -->
+	<update id="updateIssueStatusById" parameterType="objectMap">
+		UPDATE issue_batch
+		SET 
+		status=#{status} 
+		WHERE status = 0
+		and issue_id in
+		<foreach collection="issue_id" separator="," item="item" index="idx" open="(" close=")">
+            #{item,jdbcType=INTEGER}
+    	</foreach>
+	</update>
+    
+    
+   
+    <!-- 更新优惠券批次的状态 -->
+	<update id="invaildBatch" parameterType="objectMap">
+		UPDATE issue_batch
+		SET 
+		status=#{status} 
+		WHERE status in (0,1)
+		and coupon_type=#{coupon_type}
+		and use_restrict=#{use_restrict}
+		and issuer_code=#{issuer_code}
+		and issue_date=#{issue_date}
+		and batch_id=#{batch_id}
+	</update>
+    
+    
+	
+</mapper>

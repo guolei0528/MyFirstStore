@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="backMng.admin.report.etcReport">
+
+	<!-- 查询对账明细数量 -->
+	<select id="findCountReport" parameterType="objectMap"
+		resultType="Integer">
+		select count(1)
+		from statistics_report t 
+		where t.lane_type = 4 and t.operator <![CDATA[<>]]> 0
+		
+		
+		order by statistics_date,park_id,area_id,lane_id,operator,shift
+	</select>
+
+
+	<!-- 查询对账明细数据 -->
+	<select id="findReport" parameterType="objectMap"
+		resultType="objectMap">
+select park_id,area_id,lane_id,lane_type,statistics_date,operator,shift,
+flow_etc_total,toll_etc_total,flow_etc_full,toll_etc_full,
+flow_etc_coupon,toll_etc_coupon_ea,toll_etc_coupon_eb,
+flow_etc_free,
+(select park_name from park_info p where t.park_id = p.park_id) park_name,
+(select area_name from area_info a where a.park_id = t.park_id and a.area_id = t.area_id) area_name,
+(select lane_name from lane_info l where l.park_id = t.park_id 
+and l.area_id = t.area_id and l.lane_id = t.lane_id) lane_name,
+(select name from user u where u.login_name = t.operator) operator_name
+from statistics_report t 
+where t.lane_type = 4 and t.operator <![CDATA[<>]]> 0
+order by statistics_date,park_id,area_id,lane_id,operator,shift
+	</select>
+	
+</mapper>
